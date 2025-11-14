@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import loginBg from "@/assets/login-bg.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -219,8 +220,19 @@ const Login = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div 
+      className="flex items-center justify-center min-h-screen p-4 relative"
+      style={{
+        backgroundImage: `url(${loginBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm"></div>
+      
+      <Card className="w-full max-w-md relative z-10 border-border/50 bg-background/95 backdrop-blur-md shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-primary">AppMaster</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
