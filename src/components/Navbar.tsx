@@ -45,13 +45,22 @@ const Navbar = () => {
 
   const fetchUserRole = async (userId: string) => {
     try {
-      const { data } = await supabase
+      // @ts-ignore - Types will be regenerated after migration
+      const { data, error } = await supabase
+        // @ts-ignore
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .single();
       
-      setUserRole(data?.role || 'user');
+      if (error || !data) {
+        console.error('Error fetching user role:', error);
+        setUserRole('user');
+        return;
+      }
+      
+      // @ts-ignore
+      setUserRole(data.role || 'user');
     } catch (error) {
       console.error('Error fetching user role:', error);
       setUserRole('user');
@@ -59,8 +68,25 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
+    try {
+      // Clear local state first
+      setUser(null);
+      setUserRole('user');
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      
+      // Navigate to login page
+      navigate("/login");
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still navigate to login even if there's an error
+      navigate("/login");
+    }
   };
 
   const getInitials = (email: string) => {
