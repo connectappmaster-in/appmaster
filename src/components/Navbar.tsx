@@ -1,27 +1,22 @@
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Menu, LogOut, User, Settings, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-
 const Navbar = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [userRole, setUserRole] = useState<string>('user');
   const navigate = useNavigate();
-
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         await fetchUserRole(session.user.id);
@@ -30,7 +25,9 @@ const Navbar = () => {
 
     // Listen for auth changes
     const {
-      data: { subscription },
+      data: {
+        subscription
+      }
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -39,26 +36,23 @@ const Navbar = () => {
         setUserRole('user');
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
-
   const fetchUserRole = async (userId: string) => {
     try {
       // @ts-ignore - Types will be regenerated after migration
-      const { data, error } = await supabase
-        // @ts-ignore
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-      
+      const {
+        data,
+        error
+      } = await supabase
+      // @ts-ignore
+      .from('user_roles').select('role').eq('user_id', userId).single();
       if (error || !data) {
         console.error('Error fetching user role:', error);
         setUserRole('user');
         return;
       }
-      
+
       // @ts-ignore
       setUserRole(data.role || 'user');
     } catch (error) {
@@ -66,20 +60,20 @@ const Navbar = () => {
       setUserRole('user');
     }
   };
-
   const handleLogout = async () => {
     try {
       // Clear local state first
       setUser(null);
       setUserRole('user');
-      
+
       // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      
+      const {
+        error
+      } = await supabase.auth.signOut();
       if (error) {
         console.error('Logout error:', error);
       }
-      
+
       // Navigate to login page
       navigate("/login");
     } catch (error) {
@@ -88,13 +82,10 @@ const Navbar = () => {
       navigate("/login");
     }
   };
-
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
   };
-
-  return (
-    <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
+  return <nav className="fixed top-0 w-full bg-background/80 backdrop-blur-md border-b border-border z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
@@ -105,21 +96,14 @@ const Navbar = () => {
               <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                 Products
               </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Solutions
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Pricing
-              </a>
-              <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Resources
-              </a>
+              
+              
+              
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            {user ? (
-              <DropdownMenu>
+            {user ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
@@ -147,40 +131,33 @@ const Navbar = () => {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  {(userRole === 'admin' || userRole === 'super_admin') && (
-                    <>
+                  {(userRole === 'admin' || userRole === 'super_admin') && <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => navigate("/admin")}>
                         <ShieldAlert className="mr-2 h-4 w-4" />
                         <span>Admin Panel</span>
                       </DropdownMenuItem>
-                    </>
-                  )}
+                    </>}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
+              </DropdownMenu> : <>
                 <Button variant="ghost" className="hidden md:inline-flex" onClick={() => navigate("/login")}>
                   Sign In
                 </Button>
                 <Button className="bg-primary hover:bg-primary-glow text-primary-foreground" onClick={() => navigate("/login")}>
                   Start Free
                 </Button>
-              </>
-            )}
+              </>}
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
-
 export default Navbar;
