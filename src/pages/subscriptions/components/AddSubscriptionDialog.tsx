@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Plus, Upload, CalendarIcon, CheckCircle2 } from "lucide-react";
@@ -53,6 +54,17 @@ const tab3Schema = z.object({
 }).refine((data) => !data.contract_end_date || isAfter(data.contract_end_date, data.renewal_date), {
   message: "End date must be after renewal date",
   path: ["contract_end_date"],
+});
+
+const tab4Schema = z.object({
+  payment_method: z.string().min(1, "Please select a payment method"),
+  invoice_email: z.string().email("Please enter a valid email address").optional().or(z.literal("")),
+  account_email: z.string().email("Valid email address required (used for login)").min(1, "Account email is required"),
+  subscription_url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  username: z.string().max(100, "Max 100 characters").optional(),
+  notes: z.string().max(1000, "Max 1000 characters").optional(),
+  send_reminder: z.boolean(),
+  notification_methods: z.array(z.string()).min(1, "Select at least one notification method"),
 });
 
 interface AddSubscriptionDialogProps {
@@ -120,14 +132,22 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
     custom_reminder_days: "",
     status: "active",
     
-    // Tab 4: Notifications & Payment (to be implemented)
+    // Tab 4: Notifications & Payment
     payment_method: "",
+    invoice_email: "",
+    account_email: "",
+    subscription_url: "",
+    username: "",
     notes: "",
+    send_reminder: true,
+    notification_methods: ["email"] as string[],
+    hide_username: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [descriptionLength, setDescriptionLength] = useState(0);
   const [planDescLength, setPlanDescLength] = useState(0);
+  const [notesLength, setNotesLength] = useState(0);
 
   const validateTab1 = () => {
     try {
@@ -188,6 +208,34 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
         auto_renew: formData.auto_renew,
         reminder_days: formData.reminder_days === 0 ? parseInt(formData.custom_reminder_days) : formData.reminder_days,
         status: formData.status,
+      });
+      setErrors({});
+      return true;
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        err.errors.forEach((error) => {
+          if (error.path[0]) {
+            newErrors[error.path[0] as string] = error.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  const validateTab4 = () => {
+    try {
+      tab4Schema.parse({
+        payment_method: formData.payment_method,
+        invoice_email: formData.invoice_email || "",
+        account_email: formData.account_email,
+        subscription_url: formData.subscription_url || "",
+        username: formData.username || "",
+        notes: formData.notes || "",
+        send_reminder: formData.send_reminder,
+        notification_methods: formData.notification_methods,
       });
       setErrors({});
       return true;
@@ -274,11 +322,22 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, saveAndAddAnother = false) => {
     e.preventDefault();
     
     // Validate all tabs before submission
-    if (!validateTab1() || !validateTab2() || !validateTab3()) {
+    if (!validateTab1() || !validateTab2() || !validateTab3() || !validateTab4()) {
+      // Find which tab has errors and switch to it
+      if (!validateTab1()) {
+        setActiveTab("basic");
+      } else if (!validateTab2()) {
+        setActiveTab("details");
+      } else if (!validateTab3()) {
+        setActiveTab("dates");
+      } else if (!validateTab4()) {
+        setActiveTab("notifications");
+      }
+      
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields correctly",
@@ -298,14 +357,26 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
         subscription_name: formData.subscription_name,
         provider_name: formData.provider_name,
         cost: parseFloat(formData.cost),
+        currency: formData.currency,
         billing_cycle: formData.billing_cycle,
         renewal_date: formData.renewal_date?.toISOString(),
         subscription_start_date: formData.start_date?.toISOString(),
         subscription_end_date: formData.contract_end_date?.toISOString(),
         auto_renew: formData.auto_renew,
+        reminder_days: formData.reminder_days === 0 ? parseInt(formData.custom_reminder_days) : formData.reminder_days,
         category: formData.category,
+        website_url: formData.website,
+        description: formData.description,
+        plan_tier: formData.plan_name,
+        plan_description: formData.plan_description,
         payment_method: formData.payment_method,
-        notes: formData.notes + (formData.description ? `\n\nDescription: ${formData.description}` : ""),
+        invoice_email: formData.invoice_email || null,
+        account_email: formData.account_email,
+        subscription_url: formData.subscription_url || null,
+        username: formData.username || null,
+        notes: formData.notes,
+        send_reminder: formData.send_reminder,
+        notification_methods: formData.notification_methods,
         status: formData.status,
         tool_id: "00000000-0000-0000-0000-000000000000",
       });
@@ -314,11 +385,13 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
 
       toast({
         title: "Success",
-        description: "Subscription added successfully",
+        description: "Subscription added successfully!",
       });
 
       // Reset form
-      setOpen(false);
+      if (!saveAndAddAnother) {
+        setOpen(false);
+      }
       setActiveTab("basic");
       setFormData({
         subscription_name: "",
@@ -341,9 +414,19 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
         custom_reminder_days: "",
         status: "active",
         payment_method: "",
+        invoice_email: "",
+        account_email: "",
+        subscription_url: "",
+        username: "",
         notes: "",
+        send_reminder: true,
+        notification_methods: ["email"],
+        hide_username: false,
       });
       setErrors({});
+      setDescriptionLength(0);
+      setPlanDescLength(0);
+      setNotesLength(0);
       onSuccess?.();
     } catch (error: any) {
       toast({
@@ -971,30 +1054,248 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
               </div>
             </TabsContent>
 
-            {/* TAB 4: NOTIFICATIONS & PAYMENT (Placeholder) */}
-            <TabsContent value="notifications" className="space-y-4">
-              <div>
-                <Label htmlFor="payment_method">Payment Method</Label>
-                <Input
-                  id="payment_method"
-                  placeholder="e.g., Credit Card, PayPal"
-                  value={formData.payment_method}
-                  onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                />
+            {/* TAB 4: NOTIFICATIONS & PAYMENT */}
+            <TabsContent value="notifications" className="space-y-6">
+              {/* Payment Section */}
+              <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg space-y-4 border border-blue-200 dark:border-blue-900">
+                <h3 className="font-semibold text-lg">Payment Information</h3>
+                
+                <div>
+                  <Label htmlFor="payment_method">
+                    Payment Method <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.payment_method}
+                    onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
+                  >
+                    <SelectTrigger className={errors.payment_method ? "border-destructive bg-background" : "bg-background"}>
+                      <SelectValue placeholder="--Select--" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="credit_card">Credit Card</SelectItem>
+                      <SelectItem value="debit_card">Debit Card</SelectItem>
+                      <SelectItem value="upi">UPI</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                      <SelectItem value="digital_wallet">Digital Wallet</SelectItem>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.payment_method && (
+                    <p className="text-sm text-destructive mt-1">{errors.payment_method}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="invoice_email">Invoice Email</Label>
+                  <Input
+                    id="invoice_email"
+                    type="email"
+                    placeholder="where@example.com"
+                    value={formData.invoice_email}
+                    onChange={(e) => setFormData({ ...formData, invoice_email: e.target.value })}
+                    className={errors.invoice_email ? "border-destructive" : ""}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Invoices will be sent to this email</p>
+                  {errors.invoice_email && (
+                    <p className="text-sm text-destructive mt-1">{errors.invoice_email}</p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="notes">Additional Notes</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Any additional notes..."
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={4}
-                />
+              {/* Account Information Section */}
+              <div className="bg-gray-50 dark:bg-gray-950/20 p-4 rounded-lg space-y-4 border border-gray-200 dark:border-gray-800">
+                <h3 className="font-semibold text-lg">Account Information</h3>
+                
+                <div>
+                  <Label htmlFor="account_email">
+                    Account Email (Login Email) <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="account_email"
+                    type="email"
+                    placeholder="your@accountemail.com"
+                    value={formData.account_email}
+                    onChange={(e) => setFormData({ ...formData, account_email: e.target.value })}
+                    className={errors.account_email ? "border-destructive" : ""}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Email used to login to this service</p>
+                  {errors.account_email && (
+                    <p className="text-sm text-destructive mt-1">{errors.account_email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="subscription_url">Subscription URL / Login Link</Label>
+                  <Input
+                    id="subscription_url"
+                    type="url"
+                    placeholder="https://app.example.com/login"
+                    value={formData.subscription_url}
+                    onChange={(e) => setFormData({ ...formData, subscription_url: e.target.value })}
+                    className={errors.subscription_url ? "border-destructive" : ""}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Direct link to access this subscription</p>
+                  {errors.subscription_url && (
+                    <p className="text-sm text-destructive mt-1">{errors.subscription_url}</p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="username">Username (Optional)</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Your username"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className={errors.username ? "border-destructive" : ""}
+                    maxLength={100}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Username for this account</p>
+                  {errors.username && (
+                    <p className="text-sm text-destructive mt-1">{errors.username}</p>
+                  )}
+                  <div className="flex items-center gap-2 mt-2">
+                    <Checkbox
+                      id="hide_username"
+                      checked={formData.hide_username}
+                      onCheckedChange={(checked) => setFormData({ ...formData, hide_username: checked as boolean })}
+                    />
+                    <Label htmlFor="hide_username" className="font-normal cursor-pointer text-sm">
+                      Keep hidden in subscription list
+                    </Label>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex justify-between gap-3 pt-4">
+              {/* Notes Section */}
+              <div className="bg-white dark:bg-gray-950/10 p-4 rounded-lg space-y-4 border border-gray-200 dark:border-gray-800">
+                <h3 className="font-semibold text-lg">Notes & Special Terms</h3>
+                
+                <div>
+                  <Label htmlFor="notes">Notes / Special Terms</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Add coupon codes, promo details, special terms, or any other important info..."
+                    value={formData.notes}
+                    onChange={(e) => {
+                      setFormData({ ...formData, notes: e.target.value });
+                      setNotesLength(e.target.value.length);
+                    }}
+                    maxLength={1000}
+                    rows={4}
+                    className={errors.notes ? "border-destructive" : ""}
+                  />
+                  <div className="flex justify-between items-center mt-1">
+                    <p className="text-xs text-muted-foreground">Store coupon codes, discounts, or billing notes</p>
+                    <p className="text-xs text-muted-foreground">{notesLength}/1000</p>
+                  </div>
+                  {errors.notes && (
+                    <p className="text-sm text-destructive mt-1">{errors.notes}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Notifications Section */}
+              <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg space-y-4 border border-green-200 dark:border-green-900">
+                <h3 className="font-semibold text-lg">Notification Settings</h3>
+                
+                <div className="flex items-center justify-between border rounded-lg p-4 bg-background">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="send_reminder">Send Me Renewal Reminder</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive notification before renewal date
+                    </p>
+                  </div>
+                  <Switch
+                    id="send_reminder"
+                    checked={formData.send_reminder}
+                    onCheckedChange={(checked) => setFormData({ ...formData, send_reminder: checked })}
+                  />
+                </div>
+
+                {formData.send_reminder && (
+                  <div>
+                    <Label>Notify Me Via</Label>
+                    <div className="space-y-2 mt-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="notify_email"
+                          checked={formData.notification_methods.includes("email")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData({
+                                ...formData,
+                                notification_methods: [...formData.notification_methods, "email"]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                notification_methods: formData.notification_methods.filter(m => m !== "email")
+                              });
+                            }
+                          }}
+                        />
+                        <Label htmlFor="notify_email" className="font-normal cursor-pointer">
+                          Email (always enabled)
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="notify_inapp"
+                          checked={formData.notification_methods.includes("in-app")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData({
+                                ...formData,
+                                notification_methods: [...formData.notification_methods, "in-app"]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                notification_methods: formData.notification_methods.filter(m => m !== "in-app")
+                              });
+                            }
+                          }}
+                        />
+                        <Label htmlFor="notify_inapp" className="font-normal cursor-pointer">
+                          In-App Notification
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="notify_sms"
+                          checked={formData.notification_methods.includes("sms")}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData({
+                                ...formData,
+                                notification_methods: [...formData.notification_methods, "sms"]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                notification_methods: formData.notification_methods.filter(m => m !== "sms")
+                              });
+                            }
+                          }}
+                        />
+                        <Label htmlFor="notify_sms" className="font-normal cursor-pointer">
+                          SMS (if available, optional)
+                        </Label>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">How you want to receive reminders</p>
+                    {errors.notification_methods && (
+                      <p className="text-sm text-destructive mt-1">{errors.notification_methods}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Final Form Actions */}
+              <div className="flex justify-between gap-3 pt-4 border-t">
                 <Button type="button" variant="outline" onClick={() => setActiveTab("dates")}>
                   Previous
                 </Button>
@@ -1002,7 +1303,21 @@ export const AddSubscriptionDialog = ({ onSuccess }: AddSubscriptionDialogProps)
                   <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={loading} className="bg-green-600 hover:bg-green-700">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={(e) => handleSubmit(e, true)}
+                    disabled={loading}
+                  >
+                    Save & Add Another
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={(e) => handleSubmit(e, false)}
+                    disabled={loading}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    size="lg"
+                  >
                     {loading ? "Saving..." : "Save Subscription"}
                   </Button>
                 </div>

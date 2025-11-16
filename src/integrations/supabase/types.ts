@@ -366,64 +366,103 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          account_email: string | null
           auto_renew: boolean | null
           billing_cycle: string | null
           category: string | null
           cost: number | null
           created_at: string | null
+          currency: string | null
+          description: string | null
           id: string
+          invoice_email: string | null
+          logo_url: string | null
           notes: string | null
+          notification_methods: Json | null
           payment_method: string | null
+          plan_description: string | null
+          plan_tier: string | null
           provider_name: string | null
+          reminder_days: number | null
           renewal_date: string | null
+          send_reminder: boolean | null
           status: string
           subscription_end_date: string | null
           subscription_name: string | null
           subscription_start_date: string | null
+          subscription_url: string | null
           tool_id: string
           trial_days_remaining: number | null
           updated_at: string | null
           user_id: string
+          username: string | null
+          website_url: string | null
         }
         Insert: {
+          account_email?: string | null
           auto_renew?: boolean | null
           billing_cycle?: string | null
           category?: string | null
           cost?: number | null
           created_at?: string | null
+          currency?: string | null
+          description?: string | null
           id?: string
+          invoice_email?: string | null
+          logo_url?: string | null
           notes?: string | null
+          notification_methods?: Json | null
           payment_method?: string | null
+          plan_description?: string | null
+          plan_tier?: string | null
           provider_name?: string | null
+          reminder_days?: number | null
           renewal_date?: string | null
+          send_reminder?: boolean | null
           status?: string
           subscription_end_date?: string | null
           subscription_name?: string | null
           subscription_start_date?: string | null
+          subscription_url?: string | null
           tool_id: string
           trial_days_remaining?: number | null
           updated_at?: string | null
           user_id: string
+          username?: string | null
+          website_url?: string | null
         }
         Update: {
+          account_email?: string | null
           auto_renew?: boolean | null
           billing_cycle?: string | null
           category?: string | null
           cost?: number | null
           created_at?: string | null
+          currency?: string | null
+          description?: string | null
           id?: string
+          invoice_email?: string | null
+          logo_url?: string | null
           notes?: string | null
+          notification_methods?: Json | null
           payment_method?: string | null
+          plan_description?: string | null
+          plan_tier?: string | null
           provider_name?: string | null
+          reminder_days?: number | null
           renewal_date?: string | null
+          send_reminder?: boolean | null
           status?: string
           subscription_end_date?: string | null
           subscription_name?: string | null
           subscription_start_date?: string | null
+          subscription_url?: string | null
           tool_id?: string
           trial_days_remaining?: number | null
           updated_at?: string | null
           user_id?: string
+          username?: string | null
+          website_url?: string | null
         }
         Relationships: [
           {
