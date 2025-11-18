@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { RoleGuard } from '@/components/auth/RoleGuard';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { DashboardView } from '@/components/admin/DashboardView';
-import { UsersView } from '@/components/admin/UsersView';
-import { RolesView } from '@/components/admin/RolesView';
-import { SubscriptionsView } from '@/components/admin/SubscriptionsView';
-import { BillingView } from '@/components/admin/BillingView';
-import { ToolsAccessView } from '@/components/admin/ToolsAccessView';
-import { AuditLogsView } from '@/components/admin/AuditLogsView';
-import { InsightsView } from '@/components/admin/InsightsView';
-import { OrganisationSettings } from '@/components/admin/OrganisationSettings';
+import RoleGuard from '@/components/auth/RoleGuard';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import DashboardView from '@/components/admin/DashboardView';
+import UsersView from '@/components/admin/UsersView';
+import RolesView from '@/components/admin/RolesView';
+import SubscriptionsView from '@/components/admin/SubscriptionsView';
+import BillingView from '@/components/admin/BillingView';
+import ToolsAccessView from '@/components/admin/ToolsAccessView';
+import AuditLogsView from '@/components/admin/AuditLogsView';
+import InsightsView from '@/components/admin/InsightsView';
+import OrganisationSettings from '@/components/admin/OrganisationSettings';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
