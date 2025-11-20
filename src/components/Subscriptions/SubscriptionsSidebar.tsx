@@ -49,7 +49,7 @@ export const SubscriptionsSidebar = () => {
       <div
         className={`${
           collapsed ? "w-16" : "w-64"
-        } min-h-screen bg-card border-r transition-all duration-300 flex flex-col`}
+        } min-h-screen bg-card border-r transition-all duration-300 flex flex-col pt-16`}
       >
         {/* Header */}
         <div className="p-4 border-b">

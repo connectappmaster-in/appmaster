@@ -1,6 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
 import { ToolCard } from "@/components/Dashboard/ToolCard";
 import { AddToolsDialog } from "@/components/Dashboard/AddToolsDialog";
 import { Button } from "@/components/ui/button";
@@ -64,9 +63,7 @@ const IndividualDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
-      <DashboardHeader />
-      
+    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background pt-16">
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-8 border border-primary/20">
