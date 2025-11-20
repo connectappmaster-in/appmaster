@@ -71,8 +71,8 @@ export function SuperAdminSidebar() {
         maxWidth: collapsed ? "56px" : "200px",
       }}
     >
-      {/* Header */}
-      <div className="flex items-center border-b border-border h-14 px-2">
+      {/* Header - matches navbar height */}
+      <div className="flex items-center border-b border-border px-2 py-2">
         <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
           <LayoutDashboard className="h-5 w-5 text-primary" />
         </div>
