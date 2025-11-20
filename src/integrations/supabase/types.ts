@@ -2359,6 +2359,36 @@ export type Database = {
           },
         ]
       }
+      user_mfa_settings: {
+        Row: {
+          backup_codes: string[] | null
+          created_at: string | null
+          enabled_at: string | null
+          id: string
+          is_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          enabled_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[] | null
+          created_at?: string | null
+          enabled_at?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_permissions: {
         Row: {
           created_at: string | null

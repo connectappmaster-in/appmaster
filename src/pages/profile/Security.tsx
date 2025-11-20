@@ -1,17 +1,38 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
-import { Shield, Lock, Key, Smartphone, AlertTriangle } from "lucide-react";
+import { Shield, Lock, Key, Smartphone, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/Profile/ChangePasswordDialog";
 import { TwoFactorDialog } from "@/components/Profile/TwoFactorDialog";
 import { RecoveryOptionsDialog } from "@/components/Profile/RecoveryOptionsDialog";
 import { ManageDevicesDialog } from "@/components/Profile/ManageDevicesDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Security = () => {
+  const { user } = useAuth();
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isTwoFactorDialogOpen, setIsTwoFactorDialogOpen] = useState(false);
   const [isRecoveryDialogOpen, setIsRecoveryDialogOpen] = useState(false);
   const [isDevicesDialogOpen, setIsDevicesDialogOpen] = useState(false);
+
+  // Fetch MFA status
+  const { data: mfaSettings } = useQuery({
+    queryKey: ["mfa-settings", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("user_mfa_settings")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -50,13 +71,20 @@ const Security = () => {
                   <Shield className="h-6 w-6 text-green-600" />
                 </div>
               }
-              actionLabel="Set up 2-Step Verification"
+              actionLabel={mfaSettings?.is_enabled ? "Manage 2FA" : "Set up 2-Step Verification"}
               onAction={() => setIsTwoFactorDialogOpen(true)}
             >
-              <p className="text-sm text-orange-600 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Not enabled - Coming soon
-              </p>
+              {mfaSettings?.is_enabled ? (
+                <p className="text-sm text-green-600 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Enabled
+                </p>
+              ) : (
+                <p className="text-sm text-orange-600 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Not enabled
+                </p>
+              )}
             </ProfileCard>
 
             <ProfileCard
