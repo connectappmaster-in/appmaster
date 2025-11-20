@@ -57,18 +57,31 @@ export const TwoFactorDialog = ({
   // Enroll MFA
   const enrollMfaMutation = useMutation({
     mutationFn: async () => {
-      // First, clean up any existing factors
+      // First, clean up any existing factors and database settings
       const { data: factors } = await supabase.auth.mfa.listFactors();
       
       if (factors?.totp && factors.totp.length > 0) {
         for (const factor of factors.totp) {
-          await supabase.auth.mfa.unenroll({ factorId: factor.id });
+          try {
+            await supabase.auth.mfa.unenroll({ factorId: factor.id });
+          } catch (err) {
+            console.error("Error unenrolling factor:", err);
+          }
         }
       }
 
-      // Now enroll a new factor
+      // Clean up database settings
+      if (user?.id) {
+        await supabase
+          .from("user_mfa_settings")
+          .delete()
+          .eq("user_id", user.id);
+      }
+
+      // Now enroll a new factor with a friendly name
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: "totp",
+        friendlyName: "Authenticator App",
       });
 
       if (error) throw error;
