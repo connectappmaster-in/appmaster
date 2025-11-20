@@ -1,4 +1,4 @@
-import { Home, User, Shield, Lock, Users, CreditCard, Info } from "lucide-react";
+import { Home, User, Shield, CreditCard } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 
@@ -6,10 +6,7 @@ const navigationItems = [
   { title: "Home", icon: Home, path: "/profile" },
   { title: "Personal info", icon: User, path: "/profile/personal-info" },
   { title: "Security", icon: Shield, path: "/profile/security" },
-  { title: "Privacy", icon: Lock, path: "/profile/privacy" },
-  { title: "People & sharing", icon: Users, path: "/profile/people" },
   { title: "Payments", icon: CreditCard, path: "/profile/payments" },
-  { title: "About", icon: Info, path: "/profile/about" },
 ];
 
 export const ProfileSidebar = () => {
