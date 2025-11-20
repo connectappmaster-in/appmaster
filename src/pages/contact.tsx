@@ -8,53 +8,53 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MessageSquare, ArrowLeft } from "lucide-react";
 import { BackButton } from "@/components/BackButton";
-
 const Contact = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    message: "",
+    message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
       // Here you would typically send the data to your backend
       // For now, we'll just show a success message
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
+
       toast({
         title: "Message sent successfully!",
-        description: "We'll get back to you as soon as possible.",
+        description: "We'll get back to you as soon as possible."
       });
-      
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: ""
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
       <div className="container mx-auto px-4 py-8">
         <BackButton />
         
@@ -85,59 +85,25 @@ const Contact = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      placeholder="John Doe"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                    />
+                    <Input id="name" name="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
+                    <Input id="email" name="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} required />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
-                      value={formData.phone}
-                      onChange={handleChange}
-                    />
+                    <Input id="phone" name="phone" type="tel" placeholder="+1 (555) 000-0000" value={formData.phone} onChange={handleChange} />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="message">Message *</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      placeholder="Tell us about your custom tool requirements..."
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows={5}
-                      required
-                    />
+                    <Textarea id="message" name="message" placeholder="Tell us about your custom tool requirements..." value={formData.message} onChange={handleChange} rows={5} required />
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full"
-                    disabled={isSubmitting}
-                  >
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
@@ -157,12 +123,7 @@ const Contact = () => {
                   <p className="text-muted-foreground mb-2">
                     For general inquiries and custom tool requests
                   </p>
-                  <a 
-                    href="mailto:support@appmaster.com" 
-                    className="text-primary hover:underline font-medium"
-                  >
-                    support@appmaster.com
-                  </a>
+                  <a href="mailto:support@appmaster.com" className="text-primary hover:underline font-medium">connect.appmaster@gmail.com</a>
                 </CardContent>
               </Card>
 
@@ -177,10 +138,7 @@ const Contact = () => {
                   <p className="text-muted-foreground mb-2">
                     Mon-Fri from 9am to 6pm IST
                   </p>
-                  <a 
-                    href="tel:+911234567890" 
-                    className="text-primary hover:underline font-medium"
-                  >
+                  <a href="tel:+911234567890" className="text-primary hover:underline font-medium">
                     +91 123 456 7890
                   </a>
                 </CardContent>
@@ -209,8 +167,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Contact;
