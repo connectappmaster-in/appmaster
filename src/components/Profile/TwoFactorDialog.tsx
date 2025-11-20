@@ -54,9 +54,6 @@ export const TwoFactorDialog = ({
     enabled: !!user?.id && open,
   });
 
-  // Show loading if user is not available yet
-  const showLoading = isLoading || !user;
-
   // Enroll MFA
   const enrollMfaMutation = useMutation({
     mutationFn: async () => {
@@ -224,7 +221,7 @@ export const TwoFactorDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {showLoading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
