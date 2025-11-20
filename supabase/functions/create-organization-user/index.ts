@@ -59,13 +59,17 @@ serve(async (req) => {
       throw new Error('Invalid role. Must be admin, editor, or viewer');
     }
 
+    console.log(`Checking for existing user: ${email} in org: ${organisation_id}`);
+
     // Check if user already exists in this organization
     const { data: existingUser, error: existingUserError } = await supabaseAdmin
       .from('users')
-      .select('id, email, organisation_id')
+      .select('id, email, organisation_id, auth_user_id')
       .eq('email', email)
       .eq('organisation_id', organisation_id)
       .maybeSingle();
+
+    console.log('Existing user check result:', { existingUser, existingUserError });
 
     if (existingUserError && existingUserError.code !== 'PGRST116') {
       console.error('Error checking existing user:', existingUserError);
@@ -73,8 +77,22 @@ serve(async (req) => {
     }
 
     if (existingUser) {
+      console.log('User already exists:', existingUser);
       throw new Error('A user with this email already exists in this organization');
     }
+
+    // Also check if auth user exists
+    const { data: authUserList, error: authCheckError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (!authCheckError && authUserList?.users) {
+      const existingAuthUser = authUserList.users.find(u => u.email === email);
+      if (existingAuthUser) {
+        console.log('Auth user already exists:', existingAuthUser.id);
+        throw new Error('An auth user with this email already exists');
+      }
+    }
+
+    console.log(`Creating auth user for: ${email}`);
 
     // Create auth user
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
@@ -95,6 +113,9 @@ serve(async (req) => {
     if (!authData.user) {
       throw new Error('No user returned from auth creation');
     }
+
+    console.log(`Auth user created: ${authData.user.id}`);
+    console.log(`Inserting user record for: ${email} in org: ${organisation_id}`);
 
     // Create user record in users table
     const { error: userInsertError } = await supabaseAdmin
