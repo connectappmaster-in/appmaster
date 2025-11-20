@@ -145,26 +145,36 @@ serve(async (req) => {
     }
 
     console.log(`Auth user created: ${authData.user.id}`);
-    console.log(`Inserting user record for: ${email} in org: ${organisation_id}`);
-
-    // Create user record in users table
-    const { error: userInsertError } = await supabaseAdmin
+    
+    // Wait a moment for the trigger to complete
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verify the user was created by the trigger and update the role if needed
+    const { data: createdUser, error: verifyError } = await supabaseAdmin
       .from('users')
-      .insert({
-        auth_user_id: authData.user.id,
-        name: name,
-        email: email,
-        organisation_id: organisation_id,
-        user_type: 'organization',
-        role: role,
-        status: 'active',
-      });
-
-    if (userInsertError) {
-      console.error('User insert error:', userInsertError);
+      .select('id, role')
+      .eq('auth_user_id', authData.user.id)
+      .eq('organisation_id', organisation_id)
+      .maybeSingle();
+    
+    if (verifyError || !createdUser) {
+      console.error('User was not created by trigger:', verifyError);
       // Rollback: delete the auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      throw new Error(`Failed to create user record: ${userInsertError.message}`);
+      throw new Error('Failed to create user record via trigger');
+    }
+    
+    // Update the role to match what was requested (trigger sets it to 'employee' by default)
+    if (createdUser.role !== role) {
+      console.log(`Updating user role from ${createdUser.role} to ${role}`);
+      const { error: updateError } = await supabaseAdmin
+        .from('users')
+        .update({ role: role })
+        .eq('id', createdUser.id);
+      
+      if (updateError) {
+        console.error('Failed to update user role:', updateError);
+      }
     }
 
     return new Response(
