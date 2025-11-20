@@ -292,13 +292,12 @@ const Profile = () => {
                 if (window.history.length > 1) {
                   navigate(-1);
                 } else {
-                  if (userType === 'appmaster_admin') {
-                    navigate('/super-admin');
-                  } else {
-                    navigate('/');
-                  }
+                  // Default fallback navigation
+                  navigate('/');
                 }
               }}
+              aria-label="Go back"
+              type="button"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
