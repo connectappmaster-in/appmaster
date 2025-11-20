@@ -5,9 +5,8 @@ import { ToolCard } from "@/components/Dashboard/ToolCard";
 import { AddToolsDialog } from "@/components/Dashboard/AddToolsDialog";
 import { Button } from "@/components/ui/button";
 import { 
-  Users, Ticket, Package, TrendingUp, 
-  Calendar, FileText, ShoppingBag, Mail,
-  DollarSign, BarChart3, Clock, Briefcase, Plus, Sparkles
+  Users, Ticket, TrendingUp, 
+  Calendar, FileText, Briefcase, Plus, Sparkles
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,18 +49,12 @@ const IndividualDashboard = () => {
   }
 
   const allTools = [
-    { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500" },
-    { key: "tickets", name: "Tickets", icon: Ticket, path: "/tickets", color: "text-orange-500" },
-    { key: "inventory", name: "Inventory", icon: Package, path: "/inventory", color: "text-green-500" },
-    { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500" },
-    { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500" },
-    { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500" },
     { key: "assets", name: "Assets", icon: Briefcase, path: "/assets", color: "text-indigo-500" },
-    { key: "depreciation", name: "Depreciation", icon: BarChart3, path: "/depreciation", color: "text-red-500" },
-    { key: "shop", name: "Shop Income/Expense", icon: ShoppingBag, path: "/shop-income-expense", color: "text-teal-500" },
-    { key: "marketing", name: "Marketing", icon: Mail, path: "/marketing", color: "text-cyan-500" },
-    { key: "personal-expense", name: "Personal Expense", icon: DollarSign, path: "/personal-expense", color: "text-emerald-500" },
-    { key: "recruitment", name: "Recruitment", icon: Clock, path: "/recruitment", color: "text-violet-500" },
+    { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500" },
+    { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500" },
+    { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500" },
+    { key: "tickets", name: "IT Help Desk", icon: Ticket, path: "/tickets", color: "text-orange-500" },
+    { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500" },
   ];
 
   const displayedTools = allTools.filter(tool => userTools?.includes(tool.key));
@@ -129,7 +122,7 @@ const IndividualDashboard = () => {
             <div className="text-center py-16 px-4">
               <div className="max-w-md mx-auto">
                 <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Package className="w-10 h-10 text-primary" />
+                  <Sparkles className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-2xl font-semibold mb-3">No Tools Selected Yet</h3>
                 <p className="text-muted-foreground mb-6">

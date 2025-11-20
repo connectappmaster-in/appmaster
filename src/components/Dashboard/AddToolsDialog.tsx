@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Users, Ticket, Package, TrendingUp, 
-  Calendar, FileText, ShoppingBag, Mail,
-  DollarSign, BarChart3, Clock, Briefcase, LucideIcon
+  Users, Ticket, TrendingUp, 
+  Calendar, FileText, Briefcase, LucideIcon
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,18 +21,12 @@ interface Tool {
 }
 
 const AVAILABLE_TOOLS: Tool[] = [
-  { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500", description: "Manage customer relationships and interactions" },
-  { key: "tickets", name: "Tickets", icon: Ticket, path: "/tickets", color: "text-orange-500", description: "Track and resolve customer support tickets" },
-  { key: "inventory", name: "Inventory", icon: Package, path: "/inventory", color: "text-green-500", description: "Monitor stock levels and inventory" },
-  { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500", description: "Track employee attendance and schedules" },
-  { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500", description: "Create and manage invoices" },
-  { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500", description: "Manage recurring subscriptions" },
-  { key: "assets", name: "Assets", icon: Briefcase, path: "/assets", color: "text-indigo-500", description: "Track company assets and equipment" },
-  { key: "depreciation", name: "Depreciation", icon: BarChart3, path: "/depreciation", color: "text-red-500", description: "Calculate asset depreciation" },
-  { key: "shop", name: "Shop Income/Expense", icon: ShoppingBag, path: "/shop-income-expense", color: "text-teal-500", description: "Monitor shop finances" },
-  { key: "marketing", name: "Marketing", icon: Mail, path: "/marketing", color: "text-cyan-500", description: "Manage marketing campaigns" },
-  { key: "personal-expense", name: "Personal Expense", icon: DollarSign, path: "/personal-expense", color: "text-emerald-500", description: "Track personal expenses" },
-  { key: "recruitment", name: "Recruitment", icon: Clock, path: "/recruitment", color: "text-violet-500", description: "Manage hiring and recruitment" },
+  { key: "assets", name: "Assets", icon: Briefcase, path: "/assets", color: "text-indigo-500", description: "Track business assets and calculate depreciation" },
+  { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500", description: "Employee management and attendance tracking system" },
+  { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500", description: "Manage leads, contacts, and deals in one CRM platform" },
+  { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500", description: "Create and manage professional invoices with ease" },
+  { key: "tickets", name: "IT Help Desk", icon: Ticket, path: "/tickets", color: "text-orange-500", description: "Streamline customer support with ticket management" },
+  { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500", description: "Manage recurring subscriptions and billing..." },
 ];
 
 interface AddToolsDialogProps {
