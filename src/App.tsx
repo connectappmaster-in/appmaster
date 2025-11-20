@@ -44,6 +44,9 @@ import Login from "./pages/Login";
 import AuthConfirm from "./pages/AuthConfirm";
 
 import Profile from "./pages/Profile";
+import PersonalInfo from "./pages/profile/PersonalInfo";
+import Security from "./pages/profile/Security";
+import Privacy from "./pages/profile/Privacy";
 import InitializeAdmin from "./pages/InitializeAdmin";
 import PasswordReset from "./pages/PasswordReset";
 import ResetPasswordConfirm from "./pages/ResetPasswordConfirm";
@@ -108,6 +111,12 @@ const App = () => {
           <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
           <Route path="/accept-invitation" element={<AcceptInvitation />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/personal-info" element={<PersonalInfo />} />
+          <Route path="/profile/security" element={<Security />} />
+          <Route path="/profile/privacy" element={<Privacy />} />
+          <Route path="/profile/people" element={<Privacy />} />
+          <Route path="/profile/payments" element={<Privacy />} />
+          <Route path="/profile/about" element={<Privacy />} />
           <Route path="/settings" element={<Profile />} />
           <Route path="/initialize-admin" element={<InitializeAdmin />} />
           <Route path="/depreciation" element={<Depreciation />} />
