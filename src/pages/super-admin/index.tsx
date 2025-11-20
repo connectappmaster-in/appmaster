@@ -91,7 +91,7 @@ const SuperAdmin = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>
                   <div className="flex flex-col">
-                    <span className="font-medium">{user?.email}</span>
+                    <span className="font-medium">S Admin</span>
                     <span className="text-xs text-muted-foreground">Super Admin</span>
                   </div>
                 </DropdownMenuLabel>
