@@ -54,6 +54,21 @@ serve(async (req) => {
       throw new Error('Missing required fields: name, email, password');
     }
 
+    // Check if user already exists in database
+    const { data: existingUser, error: existingUserError } = await supabaseAdmin
+      .from('users')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existingUserError && existingUserError.code !== 'PGRST116') {
+      throw new Error(`Error checking existing user: ${existingUserError.message}`);
+    }
+
+    if (existingUser) {
+      throw new Error('A user with this email already exists');
+    }
+
     // Create auth user
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,

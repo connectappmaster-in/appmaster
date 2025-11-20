@@ -59,6 +59,25 @@ serve(async (req) => {
       throw new Error('Invalid role. Must be admin, editor, or viewer');
     }
 
+    // Check if user already exists in database
+    const { data: existingUser, error: existingUserError } = await supabaseAdmin
+      .from('users')
+      .select('email, organisation_id')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existingUserError && existingUserError.code !== 'PGRST116') {
+      throw new Error(`Error checking existing user: ${existingUserError.message}`);
+    }
+
+    if (existingUser) {
+      if (existingUser.organisation_id === organisation_id) {
+        throw new Error('A user with this email already exists in this organization');
+      } else {
+        throw new Error('A user with this email already exists in another organization');
+      }
+    }
+
     // Create auth user
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
