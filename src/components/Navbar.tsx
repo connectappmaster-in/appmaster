@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/appmaster-logo.png";
 import { useState, useEffect } from "react";
+import { NotificationPanel } from "@/components/NotificationPanel";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -37,7 +38,7 @@ const Navbar = () => {
           <img src={logo} alt="AppMaster" className="h-8 w-auto" />
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-2">
           {user ? (
             <>
               {!isLandingPage && (
@@ -45,6 +46,7 @@ const Navbar = () => {
                   <Button variant="ghost">Dashboard</Button>
                 </Link>
               )}
+              <NotificationPanel />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
