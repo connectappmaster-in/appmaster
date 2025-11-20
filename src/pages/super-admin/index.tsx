@@ -10,7 +10,9 @@ const SuperAdmin = () => {
         <div className="border-b px-4 flex items-center" style={{
         height: "52px"
       }}>
-          <h1 className="text-lg font-semibold">Organisations
+          <h1 className="text-lg font-semibold">Individual Users
+
+
 
         </h1>
         </div>
