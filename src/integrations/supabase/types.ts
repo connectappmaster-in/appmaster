@@ -1186,6 +1186,36 @@ export type Database = {
           },
         ]
       }
+      recovery_verification_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          type: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          type: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          type?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string | null
@@ -2653,6 +2683,7 @@ export type Database = {
         Args: { limit_type: string; org_id: string }
         Returns: boolean
       }
+      clean_expired_recovery_codes: { Args: never; Returns: undefined }
       create_notification: {
         Args: {
           p_message: string
