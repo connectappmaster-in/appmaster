@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Search, Plus, X } from "lucide-react";
+import { MoreHorizontal, Search, Plus, X, Trash2, Ban, CheckCircle, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,7 @@ export const OrganisationsTable = () => {
   const [orgUsers, setOrgUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [showAddUserDialog, setShowAddUserDialog] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [newOrgData, setNewOrgData] = useState({
     name: "",
     domain: "",
@@ -269,6 +271,7 @@ export const OrganisationsTable = () => {
     setSelectedOrg(org);
     setShowUsersDialog(true);
     setLoadingUsers(true);
+    setSelectedUsers([]); // Clear selection when opening dialog
     
     try {
       const { data, error } = await supabase
@@ -301,6 +304,136 @@ export const OrganisationsTable = () => {
       });
     } finally {
       setLoadingUsers(false);
+    }
+  };
+
+  const toggleSelectUser = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUsers.length === orgUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(orgUsers.map(user => user.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedUsers.length === 0) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .in("id", selectedUsers);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Deleted ${selectedUsers.length} user(s)`,
+      });
+
+      // Refresh users
+      if (selectedOrg) {
+        handleManageUsers(selectedOrg);
+      }
+      setSelectedUsers([]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBulkStatusChange = async (newStatus: string) => {
+    if (selectedUsers.length === 0) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .in("id", selectedUsers);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Updated status for ${selectedUsers.length} user(s)`,
+      });
+
+      // Refresh users
+      if (selectedOrg) {
+        handleManageUsers(selectedOrg);
+      }
+      setSelectedUsers([]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+
+      // Refresh users
+      if (selectedOrg) {
+        handleManageUsers(selectedOrg);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleChangeUserStatus = async (userId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User status updated to ${newStatus}`,
+      });
+
+      // Refresh users
+      if (selectedOrg) {
+        handleManageUsers(selectedOrg);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -641,6 +774,37 @@ export const OrganisationsTable = () => {
             </div>
           </DialogHeader>
           <div className="py-4">
+            {selectedUsers.length > 0 && (
+              <div className="flex items-center gap-2 mb-4 p-3 bg-muted rounded-lg">
+                <span className="text-sm text-muted-foreground">
+                  {selectedUsers.length} user(s) selected
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkStatusChange("active")}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Activate
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkStatusChange("suspended")}
+                >
+                  <Ban className="h-4 w-4 mr-1" />
+                  Suspend
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={handleBulkDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              </div>
+            )}
             {loadingUsers ? (
               <div className="text-center py-8 text-muted-foreground">
                 Loading users...
@@ -654,6 +818,12 @@ export const OrganisationsTable = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedUsers.length === orgUsers.length && orgUsers.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                        />
+                      </TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Type</TableHead>
@@ -661,11 +831,18 @@ export const OrganisationsTable = () => {
                       <TableHead>Status</TableHead>
                       <TableHead>Last Login</TableHead>
                       <TableHead>Created</TableHead>
+                      <TableHead className="w-16">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {orgUsers.map((user) => (
                       <TableRow key={user.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedUsers.includes(user.id)}
+                            onCheckedChange={() => toggleSelectUser(user.id)}
+                          />
+                        </TableCell>
                         <TableCell className="font-medium">{user.name || "—"}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
@@ -689,6 +866,52 @@ export const OrganisationsTable = () => {
                         </TableCell>
                         <TableCell className="text-sm">
                           {new Date(user.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {user.status === "active" ? (
+                                <DropdownMenuItem
+                                  onClick={() => handleChangeUserStatus(user.id, "suspended")}
+                                >
+                                  <Ban className="h-4 w-4 mr-2" />
+                                  Suspend User
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => handleChangeUserStatus(user.id, "active")}
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Activate User
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  // TODO: Implement send invitation
+                                  toast({
+                                    title: "Feature coming soon",
+                                    description: "Send invitation feature will be available soon",
+                                  });
+                                }}
+                              >
+                                <Mail className="h-4 w-4 mr-2" />
+                                Send Invitation
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete User
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
