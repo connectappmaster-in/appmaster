@@ -23,7 +23,7 @@ export const StatCard = ({ title, value, icon: Icon, trend, description }: StatC
             <p className="text-sm text-muted-foreground">{description}</p>
           )}
           {trend && (
-            <div className={`text-sm font-medium ${trend.positive ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`text-sm font-medium mt-1 ${trend.positive ? 'text-green-600' : 'text-red-600'}`}>
               {trend.positive ? '↑' : '↓'} {trend.value}
             </div>
           )}
