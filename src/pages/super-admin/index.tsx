@@ -61,23 +61,27 @@ const SuperAdmin = () => {
               <DropdownMenuContent align="end" className="w-80">
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/notifications')}>
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">New user registered</p>
                     <p className="text-xs text-muted-foreground">2 minutes ago</p>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/notifications')}>
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">Subscription upgraded</p>
                     <p className="text-xs text-muted-foreground">1 hour ago</p>
                   </div>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/notifications')}>
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">New organization created</p>
                     <p className="text-xs text-muted-foreground">3 hours ago</p>
                   </div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/notifications')} className="justify-center font-medium">
+                  View All Notifications
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

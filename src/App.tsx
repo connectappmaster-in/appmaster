@@ -68,6 +68,7 @@ import SuperAdminContactSubmissions from "./pages/super-admin/contact-submission
 import SuperAdminBroadcasts from "./pages/super-admin/broadcasts";
 import { BroadcastBanner } from "./components/BroadcastBanner";
 import AppDetailPage from "./pages/apps/[slug]";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -142,6 +143,7 @@ const App = () => {
           <Route path="/personal-expense" element={<PersonalExpense />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>}>
             <Route index element={<SuperAdminDashboard />} />
             <Route path="organisations" element={<SuperAdminOrganisations />} />
