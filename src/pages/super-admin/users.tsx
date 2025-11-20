@@ -1,13 +1,13 @@
-import { UsersTable } from "@/components/SuperAdmin/UsersTable";
+import { IndividualUsersTable } from "@/components/SuperAdmin/IndividualUsersTable";
 
 const SuperAdminUsers = () => {
   return (
-      <div className="space-y-3">
-        <div>
-          <h2 className="text-xl font-bold">Users Management</h2>
-          <p className="text-sm text-muted-foreground">Manage all users across organisations</p>
-        </div>
-      <UsersTable />
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-xl font-bold">Individual Users</h2>
+        <p className="text-sm text-muted-foreground">Manage individual user accounts</p>
+      </div>
+      <IndividualUsersTable />
     </div>
   );
 };
