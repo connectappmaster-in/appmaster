@@ -285,6 +285,74 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_dismissals: {
+        Row: {
+          broadcast_id: string
+          dismissed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          broadcast_id: string
+          dismissed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          broadcast_id?: string
+          dismissed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_dismissals_broadcast_id_fkey"
+            columns: ["broadcast_id"]
+            isOneToOne: false
+            referencedRelation: "broadcasts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broadcasts: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          scheduled_for: string | null
+          target_audience: Database["public"]["Enums"]["broadcast_target_audience"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          scheduled_for?: string | null
+          target_audience: Database["public"]["Enums"]["broadcast_target_audience"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          scheduled_for?: string | null
+          target_audience?: Database["public"]["Enums"]["broadcast_target_audience"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
@@ -846,6 +914,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          organisation_id: string | null
+          read_at: string | null
+          tenant_id: number | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          organisation_id?: string | null
+          read_at?: string | null
+          tenant_id?: number | null
+          title: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          organisation_id?: string | null
+          read_at?: string | null
+          tenant_id?: number | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
       }
       organisation_users: {
         Row: {
@@ -2539,6 +2649,19 @@ export type Database = {
     }
     Enums: {
       app_role: "owner" | "admin" | "manager" | "staff" | "viewer"
+      broadcast_target_audience:
+        | "individual_users"
+        | "organization_admins"
+        | "organization_users"
+        | "all_users"
+      notification_type:
+        | "profile_update"
+        | "role_change"
+        | "ticket_created"
+        | "ticket_updated"
+        | "system_alert"
+        | "broadcast"
+        | "general"
       super_admin_role:
         | "super_admin"
         | "saas_manager"
@@ -2674,6 +2797,21 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "admin", "manager", "staff", "viewer"],
+      broadcast_target_audience: [
+        "individual_users",
+        "organization_admins",
+        "organization_users",
+        "all_users",
+      ],
+      notification_type: [
+        "profile_update",
+        "role_change",
+        "ticket_created",
+        "ticket_updated",
+        "system_alert",
+        "broadcast",
+        "general",
+      ],
       super_admin_role: [
         "super_admin",
         "saas_manager",

@@ -1,0 +1,142 @@
+import { useState, useEffect } from "react";
+import { X, Megaphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Broadcast {
+  id: string;
+  title: string;
+  description: string;
+  target_audience: string;
+}
+
+export function BroadcastBanner() {
+  const { user, accountType, userRole } = useAuth();
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user) return;
+
+    fetchBroadcasts();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('broadcasts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'broadcasts'
+        },
+        () => {
+          fetchBroadcasts();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, accountType, userRole]);
+
+  const fetchBroadcasts = async () => {
+    if (!user) return;
+
+    // Fetch active broadcasts
+    const { data: broadcastData, error: broadcastError } = await supabase
+      .from('broadcasts')
+      .select('*')
+      .eq('is_active', true)
+      .or(`scheduled_for.is.null,scheduled_for.lte.${new Date().toISOString()}`)
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+
+    if (broadcastError) {
+      console.error('Error fetching broadcasts:', broadcastError);
+      return;
+    }
+
+    // Fetch user's dismissals
+    const { data: dismissalData } = await supabase
+      .from('broadcast_dismissals')
+      .select('broadcast_id')
+      .eq('user_id', user.id);
+
+    const dismissed = new Set(dismissalData?.map(d => d.broadcast_id) || []);
+    setDismissedIds(dismissed);
+
+    // Filter broadcasts based on user type and role
+    const filtered = (broadcastData || []).filter(broadcast => {
+      if (broadcast.target_audience === 'all_users') return true;
+      
+      if (accountType === 'personal' && broadcast.target_audience === 'individual_users') {
+        return true;
+      }
+      
+      if (accountType === 'organization') {
+        if (broadcast.target_audience === 'organization_users') return true;
+        if (broadcast.target_audience === 'organization_admins' && 
+            (userRole === 'admin' || userRole === 'owner')) {
+          return true;
+        }
+      }
+      
+      return false;
+    });
+
+    setBroadcasts(filtered);
+  };
+
+  const dismissBroadcast = async (broadcastId: string) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('broadcast_dismissals')
+      .insert({
+        broadcast_id: broadcastId,
+        user_id: user.id
+      });
+
+    if (error) {
+      console.error('Error dismissing broadcast:', error);
+      return;
+    }
+
+    setDismissedIds(prev => new Set([...prev, broadcastId]));
+  };
+
+  const visibleBroadcasts = broadcasts.filter(b => !dismissedIds.has(b.id));
+
+  if (visibleBroadcasts.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      {visibleBroadcasts.map((broadcast) => (
+        <div
+          key={broadcast.id}
+          className="bg-primary/10 border-l-4 border-primary px-4 py-3 flex items-start gap-3 animate-in slide-in-from-top duration-300"
+        >
+          <Megaphone className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <h4 className="text-sm font-semibold text-foreground mb-1">
+              {broadcast.title}
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              {broadcast.description}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 flex-shrink-0 hover:bg-primary/20"
+            onClick={() => dismissBroadcast(broadcast.id)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+}
