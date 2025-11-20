@@ -60,6 +60,7 @@ import SuperAdminPlans from "./pages/super-admin/plans";
 import SuperAdminAdmins from "./pages/super-admin/admins";
 import SuperAdminSettings from "./pages/super-admin/settings";
 import SuperAdminLogs from "./pages/super-admin/logs";
+import ContactSubmissions from "./pages/super-admin/contact-submissions";
 import AppDetailPage from "./pages/apps/[slug]";
 
 const queryClient = new QueryClient({
@@ -142,6 +143,7 @@ const App = () => {
             <Route path="api-keys" element={<SuperAdminAPIKeys />} />
             <Route path="jobs" element={<SuperAdminJobs />} />
             <Route path="admins" element={<SuperAdminAdmins />} />
+            <Route path="contact-submissions" element={<ContactSubmissions />} />
             <Route path="settings" element={<SuperAdminSettings />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, Users, DollarSign, Activity, Settings, Key, Flag, Briefcase, BarChart3, FileText, LayoutDashboard, ChevronLeft, Home, User, LogOut, Shield } from "lucide-react";
+import { Building2, Users, DollarSign, Activity, Settings, Key, Flag, Briefcase, BarChart3, FileText, LayoutDashboard, ChevronLeft, Home, User, LogOut, Shield, MessageSquare } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -45,6 +45,10 @@ const navItems = [{
   title: "Admins",
   url: "/super-admin/admins",
   icon: Shield
+}, {
+  title: "Contact Submissions",
+  url: "/super-admin/contact-submissions",
+  icon: MessageSquare
 }, {
   title: "Settings",
   url: "/super-admin/settings",
