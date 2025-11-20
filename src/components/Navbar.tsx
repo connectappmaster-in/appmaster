@@ -60,12 +60,6 @@ const Navbar = () => {
                       Profile
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile/personal-info" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
                   {(userType === 'appmaster_admin' || appmasterRole) && (
                     <DropdownMenuItem asChild>
                       <Link to="/super-admin/dashboard" className="cursor-pointer">
