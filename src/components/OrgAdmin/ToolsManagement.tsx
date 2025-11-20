@@ -7,24 +7,17 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Users, Ticket, Package, TrendingUp, Calendar, 
-  FileText, ShoppingBag, Mail, DollarSign, 
-  BarChart3, Clock, Briefcase 
+  Users, Package, TrendingUp, Calendar, 
+  FileText, Briefcase
 } from "lucide-react";
 
 const AVAILABLE_TOOLS = [
   { key: "crm", name: "CRM", icon: Users, description: "Customer relationship management" },
-  { key: "tickets", name: "IT Help Desk", icon: Ticket, description: "Support ticket management" },
   { key: "inventory", name: "Inventory", icon: Package, description: "Inventory management" },
-  { key: "attendance", name: "Attendance", icon: Calendar, description: "Attendance tracking" },
   { key: "invoicing", name: "Invoicing", icon: FileText, description: "Invoice management" },
-  { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, description: "Subscription tracking" },
   { key: "assets", name: "Assets", icon: Briefcase, description: "Asset management" },
-  { key: "depreciation", name: "Depreciation", icon: BarChart3, description: "Asset depreciation" },
-  { key: "shop", name: "Shop Income/Expense", icon: ShoppingBag, description: "Shop finances" },
-  { key: "marketing", name: "Marketing", icon: Mail, description: "Marketing campaigns" },
-  { key: "personal-expense", name: "Personal Expense", icon: DollarSign, description: "Expense tracking" },
-  { key: "recruitment", name: "Recruitment", icon: Clock, description: "Recruitment management" },
+  { key: "attendance", name: "Attendance", icon: Calendar, description: "Attendance tracking" },
+  { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, description: "Subscription tracking" },
 ];
 
 export function ToolsManagement() {
