@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { SuperAdminSidebar } from "@/components/SuperAdmin/SuperAdminSidebar";
 import { BackButton } from "@/components/BackButton";
 import { Bell, User } from "lucide-react";
@@ -33,6 +33,7 @@ const routeTitles: Record<string, string> = {
 
 const SuperAdmin = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const pageTitle = routeTitles[location.pathname] || "Super Admin";
   const { user, signOut } = useAuth();
 
@@ -96,7 +97,9 @@ const SuperAdmin = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem>Account</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}>
