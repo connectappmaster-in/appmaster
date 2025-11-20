@@ -62,7 +62,7 @@ const Navbar = () => {
                   </DropdownMenuItem>
                   {(userType === 'appmaster_admin' || appmasterRole) && (
                     <DropdownMenuItem asChild>
-                      <Link to="/super-admin/dashboard" className="cursor-pointer">
+                      <Link to="/super-admin" className="cursor-pointer">
                         <Shield className="mr-2 h-4 w-4" />
                         Admin Panel
                       </Link>
