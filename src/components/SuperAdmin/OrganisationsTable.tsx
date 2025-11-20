@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Search, Plus, X, Trash2, Ban, CheckCircle, Mail } from "lucide-react";
+import { MoreHorizontal, Search, Plus, X, Trash2, Ban, CheckCircle, Mail, Eye, UserCog, KeyRound, ClipboardList, AtSign } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -875,6 +875,40 @@ export const OrganisationsTable = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  toast({
+                                    title: "User Details",
+                                    description: `Viewing details for ${user.name || user.email}`,
+                                  });
+                                }}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  toast({
+                                    title: "Feature coming soon",
+                                    description: "Edit role feature will be available soon",
+                                  });
+                                }}
+                              >
+                                <UserCog className="h-4 w-4 mr-2" />
+                                Edit Role
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  toast({
+                                    title: "Feature coming soon",
+                                    description: "Change email feature will be available soon",
+                                  });
+                                }}
+                              >
+                                <AtSign className="h-4 w-4 mr-2" />
+                                Change Email
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               {user.status === "active" ? (
                                 <DropdownMenuItem
                                   onClick={() => handleChangeUserStatus(user.id, "suspended")}
@@ -892,7 +926,6 @@ export const OrganisationsTable = () => {
                               )}
                               <DropdownMenuItem
                                 onClick={() => {
-                                  // TODO: Implement send invitation
                                   toast({
                                     title: "Feature coming soon",
                                     description: "Send invitation feature will be available soon",
@@ -901,6 +934,28 @@ export const OrganisationsTable = () => {
                               >
                                 <Mail className="h-4 w-4 mr-2" />
                                 Send Invitation
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  toast({
+                                    title: "Feature coming soon",
+                                    description: "Reset password feature will be available soon",
+                                  });
+                                }}
+                              >
+                                <KeyRound className="h-4 w-4 mr-2" />
+                                Reset Password
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  toast({
+                                    title: "Feature coming soon",
+                                    description: "View activity feature will be available soon",
+                                  });
+                                }}
+                              >
+                                <ClipboardList className="h-4 w-4 mr-2" />
+                                View Activity
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
