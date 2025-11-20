@@ -1,8 +1,18 @@
+import { useState } from "react";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
 import { Shield, Lock, Key, Smartphone, AlertTriangle } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/Profile/ChangePasswordDialog";
+import { TwoFactorDialog } from "@/components/Profile/TwoFactorDialog";
+import { RecoveryOptionsDialog } from "@/components/Profile/RecoveryOptionsDialog";
+import { ManageDevicesDialog } from "@/components/Profile/ManageDevicesDialog";
 
 const Security = () => {
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isTwoFactorDialogOpen, setIsTwoFactorDialogOpen] = useState(false);
+  const [isRecoveryDialogOpen, setIsRecoveryDialogOpen] = useState(false);
+  const [isDevicesDialogOpen, setIsDevicesDialogOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-background">
       <ProfileSidebar />
@@ -25,6 +35,7 @@ const Security = () => {
                 </div>
               }
               actionLabel="Change password"
+              onAction={() => setIsPasswordDialogOpen(true)}
             >
               <p className="text-sm text-muted-foreground">
                 Last changed: Never
@@ -40,6 +51,7 @@ const Security = () => {
                 </div>
               }
               actionLabel="Set up 2-Step Verification"
+              onAction={() => setIsTwoFactorDialogOpen(true)}
             >
               <p className="text-sm text-orange-600 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
@@ -56,6 +68,7 @@ const Security = () => {
                 </div>
               }
               actionLabel="Manage recovery options"
+              onAction={() => setIsRecoveryDialogOpen(true)}
             />
 
             <ProfileCard
@@ -67,10 +80,29 @@ const Security = () => {
                 </div>
               }
               actionLabel="Manage devices"
+              onAction={() => setIsDevicesDialogOpen(true)}
             />
           </div>
         </div>
       </main>
+
+      {/* Dialogs */}
+      <ChangePasswordDialog
+        open={isPasswordDialogOpen}
+        onOpenChange={setIsPasswordDialogOpen}
+      />
+      <TwoFactorDialog
+        open={isTwoFactorDialogOpen}
+        onOpenChange={setIsTwoFactorDialogOpen}
+      />
+      <RecoveryOptionsDialog
+        open={isRecoveryDialogOpen}
+        onOpenChange={setIsRecoveryDialogOpen}
+      />
+      <ManageDevicesDialog
+        open={isDevicesDialogOpen}
+        onOpenChange={setIsDevicesDialogOpen}
+      />
     </div>
   );
 };
