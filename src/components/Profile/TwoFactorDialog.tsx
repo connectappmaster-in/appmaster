@@ -57,7 +57,12 @@ export const TwoFactorDialog = ({
   // Enroll MFA
   const enrollMfaMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id) throw new Error("User not authenticated");
+      // Get current session to ensure user is authenticated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.user) {
+        throw new Error("User not authenticated. Please log in again.");
+      }
 
       // First, clean up any existing factors and database settings
       const { data: factors } = await supabase.auth.mfa.listFactors();
@@ -76,7 +81,7 @@ export const TwoFactorDialog = ({
       await supabase
         .from("user_mfa_settings")
         .delete()
-        .eq("user_id", user.id);
+        .eq("user_id", session.user.id);
 
       // Wait a bit to ensure cleanup is complete
       await new Promise(resolve => setTimeout(resolve, 500));
