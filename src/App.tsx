@@ -99,7 +99,7 @@ const App = () => {
                   <Route path="/dashboard/individual" element={<ProtectedRoute><IndividualDashboard /></ProtectedRoute>} />
                   
                   {/* Organization dashboards */}
-                  <Route path="/dashboard/org-admin" element={<ProtectedRoute><OrgAdminDashboard /></ProtectedRoute>} />
+                  <Route path="/dashboard/org-admin/*" element={<ProtectedRoute><OrgAdminDashboard /></ProtectedRoute>} />
                   <Route path="/dashboard/org-editor" element={<ProtectedRoute><OrgEditorDashboard /></ProtectedRoute>} />
                   <Route path="/dashboard/org-viewer" element={<ProtectedRoute><OrgViewerDashboard /></ProtectedRoute>} />
                   

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Building2, Users, Wrench, CreditCard, Shield, Settings, ChevronLeft, Home, User, LogOut } from "lucide-react";
+import { Building2, Users, Wrench, CreditCard, Shield, Settings, ChevronLeft, Home, User, LogOut, LayoutDashboard } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -7,7 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
-  { title: "Organization Info", url: "/dashboard/org-admin", icon: Building2 },
+  { title: "Dashboard", url: "/dashboard/org-admin", icon: LayoutDashboard },
+  { title: "Organization Info", url: "/dashboard/org-admin/info", icon: Building2 },
   { title: "User Management", url: "/dashboard/org-admin/users", icon: Users },
   { title: "Active Tools", url: "/dashboard/org-admin/tools", icon: Wrench },
   { title: "Billing & Plans", url: "/dashboard/org-admin/billing", icon: CreditCard },
