@@ -11,6 +11,7 @@ import {
 import { User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/appmaster-logo.png";
+import { NotificationPanel } from "@/components/NotificationPanel";
 
 export const DashboardHeader = () => {
   const { organisation } = useOrganisation();
@@ -31,7 +32,9 @@ export const DashboardHeader = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <NotificationPanel />
+          
           <Link to="/settings">
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
