@@ -5,9 +5,8 @@ import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
 import { StatsCard } from "@/components/Dashboard/StatsCard";
 import { ToolCard } from "@/components/Dashboard/ToolCard";
 import { 
-  Users, Ticket, Package, TrendingUp, 
-  Calendar, FileText, ShoppingBag, Mail,
-  DollarSign, BarChart3, Clock, Briefcase
+  Users, Package, TrendingUp, 
+  Calendar, FileText, Briefcase
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,9 +16,11 @@ const OrgEditorDashboard = () => {
   const { organisation } = useOrganisation();
 
   const { data: stats } = useQuery({
-    queryKey: ["org-editor-stats"],
+    queryKey: ["org-editor-stats", organisation?.id],
     queryFn: async () => {
-      const [leadsCount, ticketsCount, inventoryCount] = await Promise.all([
+      if (!organisation?.id) return { leads: 0, contacts: 0, inventory: 0 };
+      
+      const [leadsCount, contactsCount, inventoryCount] = await Promise.all([
         supabase.from("crm_leads").select("*", { count: "exact", head: true }),
         supabase.from("crm_contacts").select("*", { count: "exact", head: true }),
         supabase.from("inventory_items").select("*", { count: "exact", head: true }),
@@ -27,11 +28,11 @@ const OrgEditorDashboard = () => {
 
       return {
         leads: leadsCount.count || 0,
-        tickets: ticketsCount.count || 0,
+        contacts: contactsCount.count || 0,
         inventory: inventoryCount.count || 0,
       };
     },
-    enabled: !!user,
+    enabled: !!user && !!organisation?.id,
   });
 
   if (loading) {
@@ -51,16 +52,11 @@ const OrgEditorDashboard = () => {
   
   const allTools = [
     { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500" },
-    { key: "tickets", name: "Tickets", icon: Ticket, path: "/tickets", color: "text-orange-500" },
     { key: "inventory", name: "Inventory", icon: Package, path: "/inventory", color: "text-green-500" },
-    { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500" },
     { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500" },
-    { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500" },
     { key: "assets", name: "Assets", icon: Briefcase, path: "/assets", color: "text-indigo-500" },
-    { key: "depreciation", name: "Depreciation", icon: BarChart3, path: "/depreciation", color: "text-red-500" },
-    { key: "shop", name: "Shop Income/Expense", icon: ShoppingBag, path: "/shop-income-expense", color: "text-teal-500" },
-    { key: "marketing", name: "Marketing", icon: Mail, path: "/marketing", color: "text-cyan-500" },
-    { key: "recruitment", name: "Recruitment", icon: Clock, path: "/recruitment", color: "text-violet-500" },
+    { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500" },
+    { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500" },
   ];
 
   return (
@@ -70,7 +66,9 @@ const OrgEditorDashboard = () => {
       <div className="container mx-auto px-4 py-6 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{organisation?.name}</h1>
-          <p className="text-muted-foreground">Editor Dashboard - Operational Tools</p>
+          <p className="text-muted-foreground">
+            {role === 'employee' ? 'Employee Dashboard - Your Daily Tools' : 'Editor Dashboard - Operational Tools'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -82,8 +80,8 @@ const OrgEditorDashboard = () => {
           />
           <StatsCard
             title="Total Contacts"
-            value={stats?.tickets || 0}
-            icon={Ticket}
+            value={stats?.contacts || 0}
+            icon={Users}
             color="from-orange-500 to-orange-600"
           />
           <StatsCard
@@ -95,7 +93,9 @@ const OrgEditorDashboard = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Your Tools</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            {role === 'employee' ? 'Available Tools' : 'Your Tools'}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {allTools.map((tool) => {
               const isActive = activeTools.includes(tool.key);
