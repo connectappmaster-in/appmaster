@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MoreHorizontal, Search, Trash2, Download, Ban, CheckCircle } from "lucide-react";
+import { MoreHorizontal, Search, Trash2, Download, Ban, CheckCircle, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSearchParams } from "react-router-dom";
@@ -159,6 +159,10 @@ export const IndividualUsersTable = () => {
         </div>
         <Button onClick={fetchUsers} variant="outline" size="sm">
           Refresh
+        </Button>
+        <Button size="sm">
+          <UserPlus className="w-4 h-4 mr-1" />
+          Add User
         </Button>
       </div>
 
