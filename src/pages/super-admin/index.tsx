@@ -8,7 +8,7 @@ const SuperAdmin = () => {
       <BackButton />
       <SuperAdminSidebar />
       
-      <main className="flex-1 min-h-screen flex flex-col bg-background pt-16">
+      <main className="flex-1 min-h-screen flex flex-col bg-background">
         <div className="border-b px-4 flex items-center" style={{ height: "52px" }}>
           <h1 className="text-lg font-semibold">Super Admin</h1>
         </div>
