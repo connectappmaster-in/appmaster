@@ -309,14 +309,13 @@ export default function BroadcastsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Description (Optional)</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Enter broadcast message"
                 rows={4}
-                required
               />
             </div>
             <div className="space-y-2">
