@@ -9,7 +9,7 @@ const SuperAdmin = () => {
       <SuperAdminSidebar />
       
       <main className="flex-1 min-h-screen flex flex-col bg-background">
-        <div className="border-b h-14 flex items-center px-4">
+        <div className="border-b px-4 py-2">
           <h1 className="text-lg font-semibold">Super Admin</h1>
         </div>
 
