@@ -34,10 +34,14 @@ const Navbar = () => {
         : "bg-transparent border-transparent"
     }`}>
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <img src={logo} alt="AppMaster" className="h-8 w-auto" />
-        </Link>
+        {/* Left Side - Logo */}
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+            <img src={logo} alt="AppMaster" className="h-8 w-auto" />
+          </Link>
+        </div>
 
+        {/* Right Side - Navigation */}
         <nav className="flex items-center gap-2">
           {user ? (
             <>
