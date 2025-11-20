@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, Routes, Route } from "react-router-dom";
 import { OrgAdminSidebar } from "@/components/OrgAdmin/OrgAdminSidebar";
+import { OrgDashboard } from "@/components/OrgAdmin/OrgDashboard";
 import { OrgSettings } from "@/components/OrgAdmin/OrgSettings";
 import { UserManagement } from "@/components/OrgAdmin/UserManagement";
 import { ToolsManagement } from "@/components/OrgAdmin/ToolsManagement";
@@ -35,7 +36,8 @@ const OrgAdminDashboard = () => {
 
         <div className="px-4 py-3">
           <Routes>
-            <Route index element={<OrgSettings />} />
+            <Route index element={<OrgDashboard />} />
+            <Route path="info" element={<OrgSettings />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="tools" element={<ToolsManagement />} />
             <Route path="billing" element={<BillingSettings />} />
