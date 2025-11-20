@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -99,6 +100,7 @@ const PersonalInfo = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen">
+        <BackButton />
         <ProfileSidebar />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -109,6 +111,7 @@ const PersonalInfo = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <BackButton />
       <ProfileSidebar />
       <main className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
