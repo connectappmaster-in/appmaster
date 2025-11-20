@@ -136,11 +136,9 @@ const Contact = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground mb-2">
-                    Mon-Fri from 9am to 6pm IST
+                    Mon-Sun from 9am to 6pm IST
                   </p>
-                  <a href="tel:+911234567890" className="text-primary hover:underline font-medium">
-                    +91 123 456 7890
-                  </a>
+                  <a href="tel:+911234567890" className="text-primary hover:underline font-medium">+91 8425062561</a>
                 </CardContent>
               </Card>
 
