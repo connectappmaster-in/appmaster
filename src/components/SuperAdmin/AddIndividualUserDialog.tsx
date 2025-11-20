@@ -50,33 +50,34 @@ export const AddIndividualUserDialog = ({ open, onOpenChange, onUserAdded }: Add
 
     setLoading(true);
     try {
-      // Create organization for individual user
-      const { data: orgData, error: orgError } = await supabase
-        .from("organisations")
-        .insert({
-          name: formData.name,
-          account_type: "personal",
-          plan: "free",
-          active_tools: ["crm"],
-        })
-        .select()
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error("Not authenticated");
+      }
 
-      if (orgError) throw orgError;
+      // Call edge function to create user with auth account
+      const response = await fetch(
+        'https://zxtpfrgsfuiwdppgiliv.supabase.co/functions/v1/create-individual-user',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
 
-      // Create user record
-      const { error: userError } = await supabase
-        .from("users")
-        .insert({
-          name: formData.name,
-          email: formData.email,
-          organisation_id: orgData.id,
-          user_type: "individual",
-          role: "admin",
-          status: "active",
-        });
+      const result = await response.json();
 
-      if (userError) throw userError;
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user');
+      }
 
       toast.success("Individual user created successfully");
       setFormData({ name: "", email: "", password: "" });
