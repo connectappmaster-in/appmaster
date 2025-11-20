@@ -5,6 +5,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 const navItems = [{
   title: "Dashboard",
   url: "/super-admin",
@@ -56,6 +59,7 @@ const navItems = [{
 }];
 export function SuperAdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [newSubmissionsCount, setNewSubmissionsCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const {
@@ -66,6 +70,22 @@ export function SuperAdminSidebar() {
     toast
   } = useToast();
   const currentPath = location.pathname;
+  
+  useEffect(() => {
+    const fetchNewSubmissions = async () => {
+      const { count } = await supabase
+        .from('contact_submissions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'new');
+      setNewSubmissionsCount(count || 0);
+    };
+    fetchNewSubmissions();
+    
+    // Poll every 30 seconds for new submissions
+    const interval = setInterval(fetchNewSubmissions, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
@@ -114,12 +134,20 @@ export function SuperAdminSidebar() {
         <nav className="space-y-1 px-2">
           {navItems.map(item => {
           const active = isActive(item.url);
+          const isContactSubmissions = item.url === "/super-admin/contact-submissions";
+          const showBadge = isContactSubmissions && newSubmissionsCount > 0;
+          
           const menuButton = <NavLink to={item.url} end={item.url === "/super-admin"} className={`flex items-center h-9 rounded-lg relative transition-colors duration-200 font-medium text-sm ${active ? "text-primary bg-accent" : "text-foreground hover:text-primary hover:bg-accent/50"}`}>
                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <item.icon className="w-4 h-4" />
                 </div>
-                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
+                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center gap-2 ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                   <span className="text-sm font-medium">{item.title}</span>
+                  {showBadge && !collapsed && (
+                    <Badge variant="destructive" className="h-5 min-w-5 flex items-center justify-center px-1 text-xs">
+                      {newSubmissionsCount}
+                    </Badge>
+                  )}
                 </div>
               </NavLink>;
           if (collapsed) {
