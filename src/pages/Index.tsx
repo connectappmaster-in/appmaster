@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { user, loading: authLoading } = useAuth();
-  const { currentOrganisation } = useOrganisation();
+  const { organisation, loading: orgLoading } = useOrganisation();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,30 +23,30 @@ const Index = () => {
   }, [user, authLoading, navigate]);
 
   const { data: subscription } = useQuery({
-    queryKey: ["subscription", currentOrganisation?.id],
+    queryKey: ["subscription", organisation?.id],
     queryFn: async () => {
-      if (!currentOrganisation) return null;
+      if (!organisation) return null;
       const { data } = await supabase
         .from("subscriptions")
         .select("*, subscription_plans(*)")
-        .eq("organisation_id", currentOrganisation.id)
+        .eq("organisation_id", organisation.id)
         .eq("status", "active")
         .single();
       return data;
     },
-    enabled: !!currentOrganisation,
+    enabled: !!organisation,
   });
 
   const { data: stats } = useQuery({
-    queryKey: ["dashboard-stats", currentOrganisation?.id],
+    queryKey: ["dashboard-stats", organisation?.id],
     queryFn: async () => {
-      if (!currentOrganisation) return null;
+      if (!organisation) return null;
 
       const [leads, tickets, inventory, users] = await Promise.all([
-        supabase.from("crm_leads").select("id", { count: "exact", head: true }).eq("organisation_id", currentOrganisation.id),
-        supabase.from("tickets").select("id", { count: "exact", head: true }).eq("organisation_id", currentOrganisation.id).eq("status", "open"),
-        supabase.from("inventory_items").select("id", { count: "exact", head: true }).eq("organisation_id", currentOrganisation.id),
-        supabase.from("users").select("id", { count: "exact", head: true }).eq("organisation_id", currentOrganisation.id).eq("status", "active"),
+        supabase.from("crm_leads").select("id", { count: "exact", head: true }).eq("organisation_id", organisation.id),
+        supabase.from("tickets").select("id", { count: "exact", head: true }).eq("organisation_id", organisation.id).eq("status", "open"),
+        supabase.from("inventory_items").select("id", { count: "exact", head: true }).eq("organisation_id", organisation.id),
+        supabase.from("users").select("id", { count: "exact", head: true }).eq("organisation_id", organisation.id).eq("status", "active"),
       ]);
 
       return {
@@ -56,14 +56,14 @@ const Index = () => {
         users: users.count || 0,
       };
     },
-    enabled: !!currentOrganisation,
+    enabled: !!organisation,
   });
 
   const handleActivateTool = async (toolKey: string) => {
-    if (!currentOrganisation) return;
+    if (!organisation) return;
 
     const canActivate = await supabase.rpc("can_activate_tool", {
-      org_id: currentOrganisation.id,
+      org_id: organisation.id,
     });
 
     if (!canActivate.data) {
@@ -78,9 +78,9 @@ const Index = () => {
     const { error } = await supabase
       .from("organisations")
       .update({
-        active_tools: [...((currentOrganisation as any).active_tools || []), toolKey],
+        active_tools: [...(organisation.active_tools || []), toolKey],
       })
-      .eq("id", currentOrganisation.id);
+      .eq("id", organisation.id);
 
     if (error) {
       toast({
@@ -119,7 +119,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader title="Dashboard" />
+      <DashboardHeader />
       <main className="container mx-auto px-4 py-4">
         <div className="mb-4">
           <h1 className="text-2xl font-bold mb-1">Dashboard</h1>

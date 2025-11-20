@@ -1,18 +1,18 @@
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export const BackButton = ({ to }: { to?: string }) => {
+export const BackButton = () => {
   const navigate = useNavigate();
 
   return (
     <Button
       variant="ghost"
-      onClick={() => (to ? navigate(to) : navigate(-1))}
-      className="mb-4"
+      size="icon"
+      onClick={() => navigate(-1)}
+      className="fixed top-4 left-4 z-40 h-8 w-8 hover:bg-accent"
     >
-      <ArrowLeft className="mr-2 h-4 w-4" />
-      Back
+      <ArrowLeft className="h-4 w-4" />
     </Button>
   );
 };

@@ -1,8 +1,13 @@
+import { OrganisationsTable } from "@/components/SuperAdmin/OrganisationsTable";
+
 const SuperAdminOrganisations = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Organizations</h1>
-      <p className="text-muted-foreground">Manage all organizations</p>
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-xl font-bold">Organisations Management</h2>
+          <p className="text-sm text-muted-foreground">Manage all tenant organisations</p>
+        </div>
+      <OrganisationsTable />
     </div>
   );
 };

@@ -1,10 +1,7 @@
+import { FeatureFlagsManager } from "@/components/SuperAdmin/FeatureFlagsManager";
+
 const SuperAdminFeatures = () => {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Feature Flags</h1>
-      <p className="text-muted-foreground">Manage feature flags</p>
-    </div>
-  );
+  return <FeatureFlagsManager />;
 };
 
 export default SuperAdminFeatures;

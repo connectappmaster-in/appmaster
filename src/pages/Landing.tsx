@@ -1,21 +1,21 @@
-import Navbar from '@/components/Navbar';
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import Benefits from '@/components/Benefits';
-import CTA from '@/components/CTA';
-import Footer from '@/components/Footer';
-
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import ProductShowcase from "@/components/ProductShowcase";
+import Features from "@/components/Features";
+import Benefits from "@/components/Benefits";
+import Testimonials from "@/components/Testimonials";
+import CTA from "@/components/CTA";
+import Footer from "@/components/Footer";
 const Landing = () => {
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
-      <Features />
+      
+      
       <Benefits />
-      <CTA />
+      
+      
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;

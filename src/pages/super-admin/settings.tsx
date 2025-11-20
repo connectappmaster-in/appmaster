@@ -1,9 +1,14 @@
 const SuperAdminSettings = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">System Settings</h1>
-      <p className="text-muted-foreground">Configure system settings</p>
-    </div>
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-xl font-bold">System Settings</h2>
+          <p className="text-sm text-muted-foreground">Configure global system settings</p>
+        </div>
+        <div className="border rounded-lg p-6 text-center text-sm text-muted-foreground">
+          Security & compliance settings coming soon
+        </div>
+      </div>
   );
 };
 

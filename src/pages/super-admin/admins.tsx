@@ -1,8 +1,15 @@
+import { AppmasterAdminsTable } from "@/components/SuperAdmin/AppmasterAdminsTable";
+
 const SuperAdminAdmins = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Super Admins</h1>
-      <p className="text-muted-foreground">Manage super admin users</p>
+    <div className="space-y-3">
+      <div>
+        <h2 className="text-xl font-bold">AppMaster Admins Management</h2>
+        <p className="text-sm text-muted-foreground">
+          Manage global AppMaster administrators with system-wide access
+        </p>
+      </div>
+      <AppmasterAdminsTable />
     </div>
   );
 };

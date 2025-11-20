@@ -1,14 +1,13 @@
-import Navbar from '@/components/Navbar';
+import { BackButton } from "@/components/BackButton";
 
 const AcceptInvitation = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="container mx-auto px-4 py-8 mt-16">
-        <h1 className="text-3xl font-bold mb-6">Accept Invitation</h1>
-        <p className="text-muted-foreground">Accept your organization invitation</p>
+    <>
+      <BackButton />
+      <div className="p-4">
+        <h1 className="text-2xl font-bold">Accept Invitation - Coming Soon</h1>
       </div>
-    </div>
+    </>
   );
 };
 
