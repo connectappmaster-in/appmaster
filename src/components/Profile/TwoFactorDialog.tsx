@@ -33,6 +33,7 @@ export const TwoFactorDialog = ({
   const queryClient = useQueryClient();
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [secret, setSecret] = useState("");
+  const [factorId, setFactorId] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<"info" | "setup" | "verify">("info");
 
@@ -64,6 +65,7 @@ export const TwoFactorDialog = ({
       return data;
     },
     onSuccess: async (data) => {
+      setFactorId(data.id);
       setSecret(data.totp.secret);
       const otpauthUrl = data.totp.uri;
       
@@ -84,17 +86,17 @@ export const TwoFactorDialog = ({
   // Verify and enable MFA
   const verifyMfaMutation = useMutation({
     mutationFn: async (code: string) => {
-      if (!secret) throw new Error("No secret found");
+      if (!factorId) throw new Error("No factor ID found");
 
       // Challenge and verify
       const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-        factorId: secret,
+        factorId: factorId,
       });
 
       if (challengeError) throw challengeError;
 
       const { data, error } = await supabase.auth.mfa.verify({
-        factorId: secret,
+        factorId: factorId,
         challengeId: challengeData.id,
         code: code,
       });
