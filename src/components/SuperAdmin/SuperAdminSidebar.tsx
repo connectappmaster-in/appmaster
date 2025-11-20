@@ -1,86 +1,106 @@
 import { useState } from "react";
-import { 
-  Building2, Users, DollarSign, Activity, 
-  Settings, Key, Flag, Briefcase, BarChart3, FileText, LayoutDashboard,
-  ChevronLeft, Home, User, LogOut, Shield
-} from "lucide-react";
+import { Building2, Users, DollarSign, Activity, Settings, Key, Flag, Briefcase, BarChart3, FileText, LayoutDashboard, ChevronLeft, Home, User, LogOut, Shield } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
-const navItems = [
-  { title: "Dashboard", url: "/super-admin", icon: LayoutDashboard },
-  { title: "Organisations", url: "/super-admin/organisations", icon: Building2 },
-  { title: "Users", url: "/super-admin/users", icon: Users },
-  { title: "Plans", url: "/super-admin/plans", icon: DollarSign },
-  { title: "Usage", url: "/super-admin/usage", icon: BarChart3 },
-  { title: "Logs", url: "/super-admin/logs", icon: FileText },
-  { title: "Features", url: "/super-admin/features", icon: Flag },
-  { title: "API Keys", url: "/super-admin/api-keys", icon: Key },
-  { title: "Jobs", url: "/super-admin/jobs", icon: Briefcase },
-  { title: "Admins", url: "/super-admin/admins", icon: Shield },
-  { title: "Settings", url: "/super-admin/settings", icon: Settings },
-];
-
+const navItems = [{
+  title: "Dashboard",
+  url: "/super-admin",
+  icon: LayoutDashboard
+}, {
+  title: "Organisations",
+  url: "/super-admin/organisations",
+  icon: Building2
+}, {
+  title: "Users",
+  url: "/super-admin/users",
+  icon: Users
+}, {
+  title: "Plans",
+  url: "/super-admin/plans",
+  icon: DollarSign
+}, {
+  title: "Usage",
+  url: "/super-admin/usage",
+  icon: BarChart3
+}, {
+  title: "Logs",
+  url: "/super-admin/logs",
+  icon: FileText
+}, {
+  title: "Features",
+  url: "/super-admin/features",
+  icon: Flag
+}, {
+  title: "API Keys",
+  url: "/super-admin/api-keys",
+  icon: Key
+}, {
+  title: "Jobs",
+  url: "/super-admin/jobs",
+  icon: Briefcase
+}, {
+  title: "Admins",
+  url: "/super-admin/admins",
+  icon: Shield
+}, {
+  title: "Settings",
+  url: "/super-admin/settings",
+  icon: Settings
+}];
 export function SuperAdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const { toast } = useToast();
-
+  const {
+    user,
+    signOut
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const currentPath = location.pathname;
-
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
-
   const isActive = (path: string) => {
     if (path === "/super-admin") {
       return currentPath === "/super-admin";
     }
     return currentPath.startsWith(path);
   };
-
   const handleLogout = async () => {
     try {
       await signOut();
       toast({
         title: "Logged out successfully",
-        description: "You have been logged out of your account.",
+        description: "You have been logged out of your account."
       });
-      navigate("/login", { replace: true });
+      navigate("/login", {
+        replace: true
+      });
     } catch (error) {
       console.error("Logout error:", error);
       toast({
         title: "Logout failed",
         description: "Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
-  return (
-    <div
-      className="h-screen flex flex-col border-r border-border bg-background transition-all duration-300 ease-in-out"
-      style={{
-        width: collapsed ? "56px" : "200px",
-        minWidth: collapsed ? "56px" : "200px",
-        maxWidth: collapsed ? "56px" : "200px",
-      }}
-    >
+  return <div className="h-screen flex flex-col border-r border-border bg-background transition-all duration-300 ease-in-out" style={{
+    width: collapsed ? "56px" : "200px",
+    minWidth: collapsed ? "56px" : "200px",
+    maxWidth: collapsed ? "56px" : "200px"
+  }}>
       {/* Header - matches navbar height */}
-      <div className="flex items-center border-b border-border px-2" style={{ height: "52px" }}>
-        <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
-          <LayoutDashboard className="h-5 w-5 text-primary" />
-        </div>
-        <div
-          className={`ml-2 text-foreground font-semibold text-sm whitespace-nowrap transition-all duration-300 overflow-hidden ${
-            collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-          }`}
-        >
+      <div className="flex items-center border-b border-border px-2" style={{
+      height: "52px"
+    }}>
+        
+        <div className={`ml-2 text-foreground font-semibold text-sm whitespace-nowrap transition-all duration-300 overflow-hidden ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
           Super Admin
         </div>
       </div>
@@ -88,46 +108,28 @@ export function SuperAdminSidebar() {
       {/* Main Navigation */}
       <div className="flex-1 py-3 overflow-y-auto">
         <nav className="space-y-1 px-2">
-          {navItems.map((item) => {
-            const active = isActive(item.url);
-            const menuButton = (
-              <NavLink
-                to={item.url}
-                end={item.url === "/super-admin"}
-                className={`flex items-center h-9 rounded-lg relative transition-colors duration-200 font-medium text-sm ${
-                  active
-                    ? "text-primary bg-accent"
-                    : "text-foreground hover:text-primary hover:bg-accent/50"
-                }`}
-              >
+          {navItems.map(item => {
+          const active = isActive(item.url);
+          const menuButton = <NavLink to={item.url} end={item.url === "/super-admin"} className={`flex items-center h-9 rounded-lg relative transition-colors duration-200 font-medium text-sm ${active ? "text-primary bg-accent" : "text-foreground hover:text-primary hover:bg-accent/50"}`}>
                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <item.icon className="w-4 h-4" />
                 </div>
-                <div
-                  className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                  }`}
-                >
+                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                   <span className="text-sm font-medium">{item.title}</span>
                 </div>
-              </NavLink>
-            );
-
-            if (collapsed) {
-              return (
-                <TooltipProvider key={item.title}>
+              </NavLink>;
+          if (collapsed) {
+            return <TooltipProvider key={item.title}>
                   <Tooltip>
                     <TooltipTrigger asChild>{menuButton}</TooltipTrigger>
                     <TooltipContent side="right" className="ml-2">
                       <p>{item.title}</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              );
-            }
-
-            return <div key={item.title}>{menuButton}</div>;
-          })}
+                </TooltipProvider>;
+          }
+          return <div key={item.title}>{menuButton}</div>;
+        })}
         </nav>
       </div>
 
@@ -136,69 +138,46 @@ export function SuperAdminSidebar() {
         {/* Homepage Button */}
         <div>
           {(() => {
-            const homeButton = (
-              <button
-                onClick={() => navigate("/")}
-                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
-              >
+          const homeButton = <button onClick={() => navigate("/")} className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50">
                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <Home className="w-4 h-4" />
                 </div>
-                <div
-                  className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                  }`}
-                >
+                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                   <span className="text-sm font-medium">Homepage</span>
                 </div>
-              </button>
-            );
-
-            if (collapsed) {
-              return (
-                <TooltipProvider>
+              </button>;
+          if (collapsed) {
+            return <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>{homeButton}</TooltipTrigger>
                     <TooltipContent side="right" className="ml-2">
                       <p>Homepage</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              );
-            }
-            return homeButton;
-          })()}
+                </TooltipProvider>;
+          }
+          return homeButton;
+        })()}
         </div>
 
         {/* User Profile */}
         <div>
           {(() => {
-            const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Admin";
-            const profileButton = (
-              <button
-                onClick={() => navigate("/profile")}
-                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
-              >
+          const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Admin";
+          const profileButton = <button onClick={() => navigate("/profile")} className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50">
                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4" />
                 </div>
-                <div
-                  className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                  }`}
-                >
+                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                   <div className="text-left">
                     <div className="text-sm font-medium truncate max-w-32">
                       {displayName}
                     </div>
                   </div>
                 </div>
-              </button>
-            );
-
-            if (collapsed) {
-              return (
-                <TooltipProvider>
+              </button>;
+          if (collapsed) {
+            return <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>{profileButton}</TooltipTrigger>
                     <TooltipContent side="right" className="ml-2">
@@ -208,69 +187,47 @@ export function SuperAdminSidebar() {
                       </div>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              );
-            }
-            return profileButton;
-          })()}
+                </TooltipProvider>;
+          }
+          return profileButton;
+        })()}
         </div>
 
         {/* Collapse Toggle */}
         <div>
           {(() => {
-            const collapseButton = (
-              <button
-                onClick={toggleSidebar}
-                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
-              >
+          const collapseButton = <button onClick={toggleSidebar} className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50">
                 <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
-                  <ChevronLeft
-                    className={`w-4 h-4 transition-transform duration-300 ${
-                      collapsed ? "rotate-180" : ""
-                    }`}
-                  />
+                  <ChevronLeft className={`w-4 h-4 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} />
                 </div>
-                <div
-                  className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                  }`}
-                >
+                <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                   <span className="text-sm font-medium">Collapse</span>
                 </div>
-              </button>
-            );
-
-            if (collapsed) {
-              return (
-                <TooltipProvider>
+              </button>;
+          if (collapsed) {
+            return <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>{collapseButton}</TooltipTrigger>
                     <TooltipContent side="right" className="ml-2">
                       <p>Expand sidebar</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              );
-            }
-            return collapseButton;
-          })()}
+                </TooltipProvider>;
+          }
+          return collapseButton;
+        })()}
         </div>
 
         {/* Logout */}
         <div>
           {(() => {
-            const logoutButton = (
-              <AlertDialog>
+          const logoutButton = <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <button className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50">
                     <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                       <LogOut className="w-4 h-4" />
                     </div>
-                    <div
-                      className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                        collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
-                      }`}
-                    >
+                    <div className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"}`}>
                       <span className="text-sm font-medium">Logout</span>
                     </div>
                   </button>
@@ -287,12 +244,9 @@ export function SuperAdminSidebar() {
                     <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
-              </AlertDialog>
-            );
-
-            if (collapsed) {
-              return (
-                <TooltipProvider>
+              </AlertDialog>;
+          if (collapsed) {
+            return <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <AlertDialog>
@@ -324,13 +278,11 @@ export function SuperAdminSidebar() {
                       <p>Logout</p>
                     </TooltipContent>
                   </Tooltip>
-                </TooltipProvider>
-              );
-            }
-            return logoutButton;
-          })()}
+                </TooltipProvider>;
+          }
+          return logoutButton;
+        })()}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
