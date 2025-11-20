@@ -25,12 +25,12 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const { user, userType } = useAuth();
-  const { organisation } = useOrganisation();
+  const { user } = useAuth();
+  const { currentOrganisation } = useOrganisation();
   const { toast } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isAppmasterAdmin = userType === "appmaster_admin";
+  const isAppmasterAdmin = false;
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
