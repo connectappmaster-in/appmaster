@@ -66,18 +66,18 @@ export function SuperAdminSidebar() {
     <div
       className="h-screen flex flex-col border-r border-border bg-background transition-all duration-300 ease-in-out"
       style={{
-        width: collapsed ? "64px" : "240px",
-        minWidth: collapsed ? "64px" : "240px",
-        maxWidth: collapsed ? "64px" : "240px",
+        width: collapsed ? "56px" : "200px",
+        minWidth: collapsed ? "56px" : "200px",
+        maxWidth: collapsed ? "56px" : "200px",
       }}
     >
       {/* Header */}
-      <div className="flex items-center border-b border-border h-16 px-3">
-        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-          <LayoutDashboard className="h-6 w-6 text-primary" />
+      <div className="flex items-center border-b border-border h-14 px-2">
+        <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+          <LayoutDashboard className="h-5 w-5 text-primary" />
         </div>
         <div
-          className={`ml-2 text-foreground font-semibold text-base whitespace-nowrap transition-all duration-300 overflow-hidden ${
+          className={`ml-2 text-foreground font-semibold text-sm whitespace-nowrap transition-all duration-300 overflow-hidden ${
             collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
           }`}
         >
@@ -86,26 +86,26 @@ export function SuperAdminSidebar() {
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 py-4 overflow-y-auto">
-        <nav className="space-y-1 px-3">
+      <div className="flex-1 py-3 overflow-y-auto">
+        <nav className="space-y-1 px-2">
           {navItems.map((item) => {
             const active = isActive(item.url);
             const menuButton = (
               <NavLink
                 to={item.url}
                 end={item.url === "/super-admin"}
-                className={`flex items-center h-10 rounded-lg relative transition-colors duration-200 font-medium ${
+                className={`flex items-center h-9 rounded-lg relative transition-colors duration-200 font-medium text-sm ${
                   active
                     ? "text-primary bg-accent"
                     : "text-foreground hover:text-primary hover:bg-accent/50"
                 }`}
               >
-                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5" />
+                <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-4 h-4" />
                 </div>
                 <div
                   className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-1"
+                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
                   }`}
                 >
                   <span className="text-sm font-medium">{item.title}</span>
@@ -132,21 +132,21 @@ export function SuperAdminSidebar() {
       </div>
 
       {/* Bottom Section */}
-      <div className="border-t border-border p-3 space-y-1">
+      <div className="border-t border-border p-2 space-y-1">
         {/* Homepage Button */}
         <div>
           {(() => {
             const homeButton = (
               <button
                 onClick={() => navigate("/")}
-                className="flex items-center h-10 w-full rounded-lg transition-colors font-medium text-foreground/70 hover:text-primary hover:bg-accent/50"
+                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
               >
-                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                  <Home className="w-5 h-5" />
+                <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                  <Home className="w-4 h-4" />
                 </div>
                 <div
                   className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-1"
+                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
                   }`}
                 >
                   <span className="text-sm font-medium">Homepage</span>
@@ -177,18 +177,18 @@ export function SuperAdminSidebar() {
             const profileButton = (
               <button
                 onClick={() => navigate("/profile")}
-                className="flex items-center h-10 w-full rounded-lg transition-colors font-medium text-foreground/70 hover:text-primary hover:bg-accent/50"
+                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
               >
-                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5" />
+                <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                  <User className="w-4 h-4" />
                 </div>
                 <div
                   className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-1"
+                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
                   }`}
                 >
                   <div className="text-left">
-                    <div className="text-sm font-medium truncate max-w-40">
+                    <div className="text-sm font-medium truncate max-w-32">
                       {displayName}
                     </div>
                   </div>
@@ -221,18 +221,18 @@ export function SuperAdminSidebar() {
             const collapseButton = (
               <button
                 onClick={toggleSidebar}
-                className="flex items-center h-10 w-full rounded-lg transition-colors font-medium text-foreground/70 hover:text-primary hover:bg-accent/50"
+                className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50"
               >
-                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                   <ChevronLeft
-                    className={`w-5 h-5 transition-transform duration-300 ${
+                    className={`w-4 h-4 transition-transform duration-300 ${
                       collapsed ? "rotate-180" : ""
                     }`}
                   />
                 </div>
                 <div
                   className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-1"
+                    collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
                   }`}
                 >
                   <span className="text-sm font-medium">Collapse</span>
@@ -262,13 +262,13 @@ export function SuperAdminSidebar() {
             const logoutButton = (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <button className="flex items-center h-10 w-full rounded-lg transition-colors font-medium text-foreground/70 hover:text-primary hover:bg-accent/50">
-                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                      <LogOut className="w-5 h-5" />
+                  <button className="flex items-center h-9 w-full rounded-lg transition-colors font-medium text-sm text-foreground/70 hover:text-primary hover:bg-accent/50">
+                    <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+                      <LogOut className="w-4 h-4" />
                     </div>
                     <div
                       className={`transition-all duration-300 overflow-hidden whitespace-nowrap ${
-                        collapsed ? "opacity-0 w-0" : "opacity-100 w-auto ml-1"
+                        collapsed ? "opacity-0 w-0" : "opacity-100 w-auto"
                       }`}
                     >
                       <span className="text-sm font-medium">Logout</span>
