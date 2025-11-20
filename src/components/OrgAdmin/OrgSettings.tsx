@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOrganisation } from "@/contexts/OrganisationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,17 @@ export function OrgSettings() {
     billing_email: (organisation as any)?.billing_email || "",
     gst_number: (organisation as any)?.gst_number || "",
   });
+
+  useEffect(() => {
+    if (organisation) {
+      setFormData({
+        name: organisation.name || "",
+        address: (organisation as any)?.address || "",
+        billing_email: (organisation as any)?.billing_email || "",
+        gst_number: (organisation as any)?.gst_number || "",
+      });
+    }
+  }, [organisation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
