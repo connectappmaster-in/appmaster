@@ -12,5 +12,17 @@ export const StatsCard = ({
   icon: Icon,
   color
 }: StatsCardProps) => {
-  return;
+  return (
+    <Card className="p-6 hover:shadow-lg transition-shadow">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground mb-1">{title}</p>
+          <h3 className="text-3xl font-bold">{value}</h3>
+        </div>
+        <div className={`w-14 h-14 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}>
+          <Icon className="w-7 h-7 text-white" />
+        </div>
+      </div>
+    </Card>
+  );
 };
