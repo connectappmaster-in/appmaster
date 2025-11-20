@@ -1,7 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
-import { StatsCard } from "@/components/Dashboard/StatsCard";
 import { ToolCard } from "@/components/Dashboard/ToolCard";
 import { AddToolsDialog } from "@/components/Dashboard/AddToolsDialog";
 import { Button } from "@/components/ui/button";
@@ -23,34 +22,18 @@ const IndividualDashboard = () => {
     queryFn: async () => {
       if (!user) return [];
       
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
-        .select("selected_tools")
+        .select("*")
         .eq("id", user.id)
         .single();
       
-      return data?.selected_tools || [];
+      // Return empty array if selected_tools doesn't exist yet
+      return (data as any)?.selected_tools || [];
     },
     enabled: !!user,
   });
 
-  const { data: stats } = useQuery({
-    queryKey: ["individual-stats"],
-    queryFn: async () => {
-      const [leadsCount, ticketsCount, inventoryCount] = await Promise.all([
-        supabase.from("crm_leads").select("*", { count: "exact", head: true }),
-        supabase.from("crm_contacts").select("*", { count: "exact", head: true }),
-        supabase.from("inventory_items").select("*", { count: "exact", head: true }),
-      ]);
-
-      return {
-        leads: leadsCount.count || 0,
-        tickets: ticketsCount.count || 0,
-        inventory: inventoryCount.count || 0,
-      };
-    },
-    enabled: !!user,
-  });
 
   if (loading) {
     return (
@@ -118,27 +101,6 @@ const IndividualDashboard = () => {
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatsCard
-            title="Total Leads"
-            value={stats?.leads || 0}
-            icon={Users}
-            color="from-blue-500 to-blue-600"
-          />
-          <StatsCard
-            title="Total Contacts"
-            value={stats?.tickets || 0}
-            icon={Ticket}
-            color="from-orange-500 to-orange-600"
-          />
-          <StatsCard
-            title="Inventory Items"
-            value={stats?.inventory || 0}
-            icon={Package}
-            color="from-green-500 to-green-600"
-          />
-        </div>
 
         {/* Tools Section */}
         <div className="space-y-4">
