@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 import { NotificationPanel } from "@/components/NotificationPanel";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, userType, appmasterRole } = useAuth();
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,11 +61,19 @@ const Navbar = () => {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/admin" className="cursor-pointer">
+                    <Link to="/profile/personal-info" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </Link>
                   </DropdownMenuItem>
+                  {(userType === 'appmaster_admin' || appmasterRole) && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/super-admin/dashboard" className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
