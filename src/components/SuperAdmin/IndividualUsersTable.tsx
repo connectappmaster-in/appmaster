@@ -7,7 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MoreHorizontal, Search, Trash2, Download, Ban, CheckCircle, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useSearchParams } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { AddIndividualUserDialog } from "./AddIndividualUserDialog";
 
@@ -20,6 +23,14 @@ export const IndividualUsersTable = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [searchParams] = useSearchParams();
   const orgFilter = searchParams.get("org");
+  const navigate = useNavigate();
+  
+  // Dialog states
+  const [updateNameDialog, setUpdateNameDialog] = useState<{open: boolean, user: any | null}>({open: false, user: null});
+  const [updateStatusDialog, setUpdateStatusDialog] = useState<{open: boolean, user: any | null}>({open: false, user: null});
+  const [deleteDialog, setDeleteDialog] = useState<{open: boolean, user: any | null}>({open: false, user: null});
+  const [newName, setNewName] = useState("");
+  const [newStatus, setNewStatus] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -116,6 +127,75 @@ export const IndividualUsersTable = () => {
       fetchUsers();
     } catch (error: any) {
       toast.error("Failed to update users: " + error.message);
+    }
+  };
+
+  const handleUpdateName = async () => {
+    if (!updateNameDialog.user || !newName.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ name: newName.trim() })
+        .eq("id", updateNameDialog.user.id);
+      
+      if (error) throw error;
+      toast.success("User name updated successfully");
+      setUpdateNameDialog({open: false, user: null});
+      setNewName("");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to update name: " + error.message);
+    }
+  };
+
+  const handleUpdateStatus = async () => {
+    if (!updateStatusDialog.user || !newStatus) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", updateStatusDialog.user.id);
+      
+      if (error) throw error;
+      toast.success("User status updated successfully");
+      setUpdateStatusDialog({open: false, user: null});
+      setNewStatus("");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to update status: " + error.message);
+    }
+  };
+
+  const handleResetPassword = async (user: any) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/reset-password-confirm`,
+      });
+      
+      if (error) throw error;
+      toast.success("Password reset email sent to " + user.email);
+    } catch (error: any) {
+      toast.error("Failed to send reset email: " + error.message);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteDialog.user) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", deleteDialog.user.id);
+      
+      if (error) throw error;
+      toast.success("User deleted successfully");
+      setDeleteDialog({open: false, user: null});
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to delete user: " + error.message);
     }
   };
 
@@ -267,12 +347,33 @@ export const IndividualUsersTable = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem>View Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Update Name</DropdownMenuItem>
-                        <DropdownMenuItem>Update Status</DropdownMenuItem>
-                        <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                        <DropdownMenuItem>View Login Activity</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete User</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/super-admin/users/${user.id}`)}>
+                          View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setUpdateNameDialog({open: true, user});
+                          setNewName(user.name || "");
+                        }}>
+                          Update Name
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setUpdateStatusDialog({open: true, user});
+                          setNewStatus(user.status);
+                        }}>
+                          Update Status
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleResetPassword(user)}>
+                          Reset Password
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/super-admin/users/${user.id}/activity`)}>
+                          View Login Activity
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => setDeleteDialog({open: true, user})}
+                        >
+                          Delete User
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -282,6 +383,86 @@ export const IndividualUsersTable = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Update Name Dialog */}
+      <Dialog open={updateNameDialog.open} onOpenChange={(open) => !open && setUpdateNameDialog({open: false, user: null})}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update User Name</DialogTitle>
+            <DialogDescription>
+              Update the name for {updateNameDialog.user?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Enter new name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpdateNameDialog({open: false, user: null})}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateName}>Update</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Status Dialog */}
+      <Dialog open={updateStatusDialog.open} onOpenChange={(open) => !open && setUpdateStatusDialog({open: false, user: null})}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update User Status</DialogTitle>
+            <DialogDescription>
+              Update the status for {updateStatusDialog.user?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={newStatus} onValueChange={setNewStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpdateStatusDialog({open: false, user: null})}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateStatus}>Update</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({open: false, user: null})}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {deleteDialog.user?.email}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialog({open: false, user: null})}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

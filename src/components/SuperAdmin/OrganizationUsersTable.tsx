@@ -7,7 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MoreHorizontal, Search, Trash2, Download, Ban, CheckCircle, UserCog } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useSearchParams } from "react-router-dom";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export const OrganizationUsersTable = () => {
@@ -18,6 +21,12 @@ export const OrganizationUsersTable = () => {
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [searchParams] = useSearchParams();
   const orgFilter = searchParams.get("org");
+  const navigate = useNavigate();
+  
+  // Dialog states
+  const [changeRoleDialog, setChangeRoleDialog] = useState<{open: boolean, user: any | null}>({open: false, user: null});
+  const [deleteDialog, setDeleteDialog] = useState<{open: boolean, user: any | null}>({open: false, user: null});
+  const [newRole, setNewRole] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -113,6 +122,73 @@ export const OrganizationUsersTable = () => {
       fetchUsers();
     } catch (error: any) {
       toast.error("Failed to update users: " + error.message);
+    }
+  };
+
+  const handleChangeRole = async () => {
+    if (!changeRoleDialog.user || !newRole) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ role: newRole })
+        .eq("id", changeRoleDialog.user.id);
+      
+      if (error) throw error;
+      toast.success("User role updated successfully");
+      setChangeRoleDialog({open: false, user: null});
+      setNewRole("");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to update role: " + error.message);
+    }
+  };
+
+  const handleToggleStatus = async (user: any) => {
+    const newStatus = user.status === "active" ? "suspended" : "active";
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", user.id);
+      
+      if (error) throw error;
+      toast.success(`User ${newStatus === "active" ? "activated" : "deactivated"} successfully`);
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to update status: " + error.message);
+    }
+  };
+
+  const handleResetPassword = async (user: any) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/reset-password-confirm`,
+      });
+      
+      if (error) throw error;
+      toast.success("Password reset email sent to " + user.email);
+    } catch (error: any) {
+      toast.error("Failed to send reset email: " + error.message);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteDialog.user) return;
+    
+    try {
+      const { error } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", deleteDialog.user.id);
+      
+      if (error) throw error;
+      toast.success("User deleted successfully");
+      setDeleteDialog({open: false, user: null});
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Failed to delete user: " + error.message);
     }
   };
 
@@ -262,12 +338,30 @@ export const OrganizationUsersTable = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuItem>View Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Change Role</DropdownMenuItem>
-                        <DropdownMenuItem>Assign Tools / Permissions</DropdownMenuItem>
-                        <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                        <DropdownMenuItem>Deactivate / Activate User</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete User</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/super-admin/users/${user.id}`)}>
+                          View Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setChangeRoleDialog({open: true, user});
+                          setNewRole(user.role || "");
+                        }}>
+                          Change Role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(`/super-admin/users/${user.id}/permissions`)}>
+                          Assign Tools / Permissions
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleResetPassword(user)}>
+                          Reset Password
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleToggleStatus(user)}>
+                          {user.status === "active" ? "Deactivate" : "Activate"} User
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive"
+                          onClick={() => setDeleteDialog({open: true, user})}
+                        >
+                          Delete User
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -277,6 +371,59 @@ export const OrganizationUsersTable = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Change Role Dialog */}
+      <Dialog open={changeRoleDialog.open} onOpenChange={(open) => !open && setChangeRoleDialog({open: false, user: null})}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Update the role for {changeRoleDialog.user?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={newRole} onValueChange={setNewRole}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="owner">Owner</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChangeRoleDialog({open: false, user: null})}>
+              Cancel
+            </Button>
+            <Button onClick={handleChangeRole}>Update Role</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({open: false, user: null})}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {deleteDialog.user?.email}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialog({open: false, user: null})}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
