@@ -1,6 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, Routes, Route } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { OrgAdminSidebar } from "@/components/OrgAdmin/OrgAdminSidebar";
 import { OrgSettings } from "@/components/OrgAdmin/OrgSettings";
 import { UserManagement } from "@/components/OrgAdmin/UserManagement";
@@ -70,29 +69,26 @@ const OrgAdminDashboard = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <OrgAdminSidebar />
-        
-        <div className="flex-1">
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-6">
-            <SidebarTrigger />
-            <div className="flex-1" />
-          </header>
-
-          <main className="p-6">
-            <Routes>
-              <Route index element={<OrgSettings />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="tools" element={<ToolsManagement />} />
-              <Route path="billing" element={<BillingSettings />} />
-              <Route path="security" element={<SecuritySettings />} />
-              <Route path="settings" element={<GeneralSettings />} />
-            </Routes>
-          </main>
+    <div className="min-h-screen flex w-full">
+      <OrgAdminSidebar />
+      
+      <main className="flex-1 min-h-screen flex flex-col bg-background">
+        <div className="border-b px-4 flex items-center" style={{ height: "52px" }}>
+          <h1 className="text-lg font-semibold">Organization Admin</h1>
         </div>
-      </div>
-    </SidebarProvider>
+
+        <div className="px-4 py-3">
+          <Routes>
+            <Route index element={<OrgSettings />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="tools" element={<ToolsManagement />} />
+            <Route path="billing" element={<BillingSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="settings" element={<GeneralSettings />} />
+          </Routes>
+        </div>
+      </main>
+    </div>
   );
 };
 
