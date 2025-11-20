@@ -1,6 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganisation } from "@/contexts/OrganisationContext";
 import { Navigate } from "react-router-dom";
+import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
 import { StatsCard } from "@/components/Dashboard/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -50,6 +51,8 @@ const OrgViewerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <DashboardHeader />
+      
       <div className="container mx-auto px-4 py-6 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{organisation?.name}</h1>
