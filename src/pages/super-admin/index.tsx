@@ -100,7 +100,6 @@ const SuperAdmin = () => {
                 <DropdownMenuItem onClick={() => navigate('/profile')}>
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>Account</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}>
                   Logout
