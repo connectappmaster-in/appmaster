@@ -1,10 +1,12 @@
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
+import { BackButton } from "@/components/BackButton";
 import { Eye, Database, FileText, Settings } from "lucide-react";
 
 const Privacy = () => {
   return (
     <div className="flex min-h-screen bg-background">
+      <BackButton />
       <ProfileSidebar />
       <main className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
+import { BackButton } from "@/components/BackButton";
 import { Shield, Lock, Key, Smartphone, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { ChangePasswordDialog } from "@/components/Profile/ChangePasswordDialog";
 import { TwoFactorDialog } from "@/components/Profile/TwoFactorDialog";
@@ -36,6 +37,7 @@ const Security = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <BackButton />
       <ProfileSidebar />
       <main className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">

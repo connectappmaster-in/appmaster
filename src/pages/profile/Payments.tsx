@@ -5,6 +5,7 @@ import { CreditCard, Plus, Download, Receipt, CheckCircle2, Clock } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganisation } from "@/contexts/OrganisationContext";
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -92,6 +93,7 @@ const Payments = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <BackButton />
       <ProfileSidebar />
       
       <main className="flex-1 overflow-auto">
