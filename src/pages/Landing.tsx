@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ProductShowcase from "@/components/ProductShowcase";
 import Features from "@/components/Features";
@@ -8,7 +7,6 @@ import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 const Landing = () => {
   return <div className="min-h-screen bg-background">
-      <Navbar />
       <Hero />
       
       
