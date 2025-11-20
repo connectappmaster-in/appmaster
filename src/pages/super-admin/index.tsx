@@ -23,18 +23,18 @@ const SuperAdmin = () => {
   const location = useLocation();
   const pageTitle = routeTitles[location.pathname] || "Super Admin";
 
-  return <div className="min-h-screen flex w-full">
+  return <div className="h-screen flex w-full overflow-hidden">
       <BackButton />
       <SuperAdminSidebar />
       
-      <main className="flex-1 min-h-screen flex flex-col bg-background">
-        <div className="border-b px-4 flex items-center" style={{
+      <main className="flex-1 h-screen flex flex-col bg-background">
+        <div className="border-b px-4 flex items-center shrink-0" style={{
         height: "52px"
       }}>
           <h1 className="text-lg font-semibold">{pageTitle}</h1>
         </div>
 
-        <div className="px-4 py-3">
+        <div className="flex-1 overflow-y-auto px-4 py-3">
           <Outlet />
         </div>
       </main>
