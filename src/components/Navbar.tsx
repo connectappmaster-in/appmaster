@@ -41,11 +41,6 @@ const Navbar = () => {
         <nav className="flex items-center gap-2">
           {user ? (
             <>
-              {!isLandingPage && (
-                <Link to="/dashboard">
-                  <Button variant="ghost">Dashboard</Button>
-                </Link>
-              )}
               <NotificationPanel />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -54,6 +49,12 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
