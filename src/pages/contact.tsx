@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MessageSquare, ArrowLeft } from "lucide-react";
 import { BackButton } from "@/components/BackButton";
+import { supabase } from "@/integrations/supabase/client";
 const Contact = () => {
   const navigate = useNavigate();
   const {
@@ -24,9 +25,16 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // Here you would typically send the data to your backend
-      // For now, we'll just show a success message
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          message: formData.message,
+        });
+
+      if (error) throw error;
 
       toast({
         title: "Message sent successfully!",
@@ -39,6 +47,7 @@ const Contact = () => {
         message: ""
       });
     } catch (error) {
+      console.error('Error submitting contact form:', error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
