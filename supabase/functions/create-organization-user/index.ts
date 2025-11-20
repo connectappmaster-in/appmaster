@@ -23,50 +23,49 @@ serve(async (req) => {
       }
     );
 
-    // Verify the request is from a super admin
+    // Get the current user making the request
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('No authorization header');
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    const { data: { user: requestingUser }, error: userAuthError } = await supabaseAdmin.auth.getUser(token);
     
-    if (userError || !user) {
+    if (userAuthError || !requestingUser) {
       throw new Error('Unauthorized');
     }
 
-    // Check if user is super admin
-    const { data: adminData, error: checkError } = await supabaseAdmin
-      .from('appmaster_admins')
-      .select('admin_role, is_active')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
+    // Get the requesting user's organization and verify they're an admin
+    const { data: adminUser, error: adminCheckError } = await supabaseAdmin
+      .from('users')
+      .select('organisation_id, role')
+      .eq('auth_user_id', requestingUser.id)
       .single();
 
-    if (checkError || !adminData || !['super_admin', 'admin'].includes(adminData.admin_role)) {
-      throw new Error('Unauthorized: Not a super admin');
+    if (adminCheckError || !adminUser || adminUser.role !== 'admin') {
+      throw new Error('Unauthorized: Admin privileges required');
     }
 
-    const { name, email, password, role, organisation_id } = await req.json();
+    const { name, email, password, role } = await req.json();
 
-    if (!name || !email || !password || !role || !organisation_id) {
-      throw new Error('Missing required fields: name, email, password, role, organisation_id');
+    if (!name || !email || !password || !role) {
+      throw new Error('Missing required fields: name, email, password, role');
     }
 
-    // Validate role
-    if (!['admin', 'editor', 'viewer'].includes(role)) {
-      throw new Error('Invalid role. Must be admin, editor, or viewer');
+    // Validate password length
+    if (password.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
     }
 
-    console.log(`Checking for existing user: ${email} in org: ${organisation_id}`);
+    console.log(`Checking for existing user: ${email} in org: ${adminUser.organisation_id}`);
 
     // Direct query to check for existing user, using service role to bypass RLS
     const { data: existingUsers, error: existingUserError } = await supabaseAdmin
       .from('users')
       .select('id, email, organisation_id, auth_user_id')
       .ilike('email', email)
-      .eq('organisation_id', organisation_id);
+      .eq('organisation_id', adminUser.organisation_id);
 
     console.log('Existing user check result:', { count: existingUsers?.length, existingUserError });
 
@@ -109,7 +108,7 @@ serve(async (req) => {
           .from('users')
           .select('id')
           .eq('auth_user_id', existingAuthUser.id)
-          .eq('organisation_id', organisation_id);
+          .eq('organisation_id', adminUser.organisation_id);
         
         if (linkedUsers && linkedUsers.length > 0) {
           // Auth user has a linked record in this org - true duplicate
@@ -125,19 +124,20 @@ serve(async (req) => {
     console.log(`Creating auth user for: ${email}`);
 
     // Create auth user
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    const { data: authData, error: createAuthError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
       user_metadata: {
         name,
-        organisation_id
+        organisation_id: adminUser.organisation_id,
+        account_type: 'organization',
       }
     });
 
-    if (authError) {
-      console.error('Auth error:', authError);
-      throw new Error(`Failed to create auth user: ${authError.message}`);
+    if (createAuthError) {
+      console.error('Auth error:', createAuthError);
+      throw new Error(`Failed to create auth user: ${createAuthError.message}`);
     }
 
     if (!authData.user) {
@@ -154,7 +154,7 @@ serve(async (req) => {
       .from('users')
       .select('id, role')
       .eq('auth_user_id', authData.user.id)
-      .eq('organisation_id', organisation_id)
+      .eq('organisation_id', adminUser.organisation_id)
       .maybeSingle();
     
     if (verifyError || !createdUser) {
@@ -184,7 +184,7 @@ serve(async (req) => {
           id: authData.user.id,
           email: authData.user.email,
           name: name,
-          organisation_id: organisation_id,
+          organisation_id: adminUser.organisation_id,
           role: role
         }
       }),

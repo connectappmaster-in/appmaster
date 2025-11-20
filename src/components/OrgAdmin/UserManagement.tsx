@@ -5,8 +5,8 @@ import { useOrganisation } from "@/contexts/OrganisationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Shield } from "lucide-react";
-import { InviteUserDialog } from "./InviteUserDialog";
+import { Mail, Shield, UserPlus } from "lucide-react";
+import { CreateUserDialog } from "./CreateUserDialog";
 import { EditUserDialog } from "./EditUserDialog";
 import {
   Table,
@@ -19,6 +19,7 @@ import {
 
 export function UserManagement() {
   const { organisation } = useOrganisation();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editUser, setEditUser] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -48,7 +49,10 @@ export function UserManagement() {
             Manage users and their roles in your organization
           </p>
         </div>
-        <InviteUserDialog />
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          Create User
+        </Button>
       </div>
 
       <Card>
@@ -118,6 +122,12 @@ export function UserManagement() {
           )}
         </CardContent>
       </Card>
+
+      <CreateUserDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={refetch}
+      />
 
       <EditUserDialog
         user={editUser}
