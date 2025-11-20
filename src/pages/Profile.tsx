@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
+import { BackButton } from "@/components/BackButton";
 import { Loader2, Mail, Shield, Lock, Search, Key, Smartphone, Activity, Eye, Settings, AlertCircle, CheckCircle2 } from "lucide-react";
 const Profile = () => {
   const {
@@ -233,6 +234,7 @@ const Profile = () => {
       </div>;
   }
   return <div className="flex min-h-screen bg-background">
+      <BackButton />
       {/* Sidebar */}
       <ProfileSidebar />
 
