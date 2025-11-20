@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const IndividualDashboard = () => {
-  const { user, accountType, loading } = useAuth();
+  const { user, accountType, userType, loading } = useAuth();
 
   const { data: stats } = useQuery({
     queryKey: ["individual-stats"],
@@ -40,7 +40,9 @@ const IndividualDashboard = () => {
     );
   }
 
-  if (accountType !== "personal") {
+  // Only redirect if accountType is explicitly set to something other than personal
+  // (don't redirect while still loading or if null)
+  if (accountType && accountType !== "personal" && userType !== "individual") {
     return <Navigate to="/dashboard" replace />;
   }
 
