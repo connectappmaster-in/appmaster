@@ -67,6 +67,39 @@ export type Database = {
           },
         ]
       }
+      appmaster_admins: {
+        Row: {
+          admin_role: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          permissions: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_role: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_role?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       assets: {
         Row: {
           asset_type: string | null
@@ -120,6 +153,20 @@ export type Database = {
           useful_life_years?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "assets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assets_created_by_fkey"
             columns: ["created_by"]
@@ -186,6 +233,20 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
             referencedColumns: ["id"]
           },
           {
@@ -269,6 +330,20 @@ export type Database = {
             foreignKeyName: "crm_contacts_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -335,6 +410,20 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "crm_deals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "crm_deals_created_by_fkey"
             columns: ["created_by"]
@@ -527,6 +616,20 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inventory_items_created_by_fkey"
             columns: ["created_by"]
@@ -764,43 +867,55 @@ export type Database = {
       }
       organisations: {
         Row: {
+          account_type: string | null
           active_tools: string[] | null
           address: string | null
           billing_email: string | null
           created_at: string | null
+          domain: string | null
           gst_number: string | null
           id: string
           logo_url: string | null
           name: string
           plan: string | null
+          plan_activated_at: string | null
+          plan_expires_at: string | null
           plan_id: string | null
           timezone: string | null
           updated_at: string | null
         }
         Insert: {
+          account_type?: string | null
           active_tools?: string[] | null
           address?: string | null
           billing_email?: string | null
           created_at?: string | null
+          domain?: string | null
           gst_number?: string | null
           id?: string
           logo_url?: string | null
           name: string
           plan?: string | null
+          plan_activated_at?: string | null
+          plan_expires_at?: string | null
           plan_id?: string | null
           timezone?: string | null
           updated_at?: string | null
         }
         Update: {
+          account_type?: string | null
           active_tools?: string[] | null
           address?: string | null
           billing_email?: string | null
           created_at?: string | null
+          domain?: string | null
           gst_number?: string | null
           id?: string
           logo_url?: string | null
           name?: string
           plan?: string | null
+          plan_activated_at?: string | null
+          plan_expires_at?: string | null
           plan_id?: string | null
           timezone?: string | null
           updated_at?: string | null
@@ -946,6 +1061,457 @@ export type Database = {
           },
         ]
       }
+      saas_api_keys: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          organisation_id: string | null
+          scopes: string[] | null
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          organisation_id?: string | null
+          scopes?: string[] | null
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          organisation_id?: string | null
+          scopes?: string[] | null
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_api_keys_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "saas_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saas_api_keys_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "saas_organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_billing_history: {
+        Row: {
+          amount: number
+          bill_period_end: string
+          bill_period_start: string
+          created_at: string | null
+          id: string
+          invoice_url: string | null
+          organisation_id: string | null
+          payment_provider: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          bill_period_end: string
+          bill_period_start: string
+          created_at?: string | null
+          id?: string
+          invoice_url?: string | null
+          organisation_id?: string | null
+          payment_provider?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          bill_period_end?: string
+          bill_period_start?: string
+          created_at?: string | null
+          id?: string
+          invoice_url?: string | null
+          organisation_id?: string | null
+          payment_provider?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_billing_history_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "saas_organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_feature_flags: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          enabled_for_orgs: string[] | null
+          enabled_for_plans: string[] | null
+          feature_key: string
+          feature_name: string
+          id: string
+          is_global_enabled: boolean | null
+          rollout_percentage: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          enabled_for_orgs?: string[] | null
+          enabled_for_plans?: string[] | null
+          feature_key: string
+          feature_name: string
+          id?: string
+          is_global_enabled?: boolean | null
+          rollout_percentage?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          enabled_for_orgs?: string[] | null
+          enabled_for_plans?: string[] | null
+          feature_key?: string
+          feature_name?: string
+          id?: string
+          is_global_enabled?: boolean | null
+          rollout_percentage?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      saas_org_user_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          org_role: string | null
+          organisation_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          org_role?: string | null
+          organisation_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          org_role?: string | null
+          organisation_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_org_user_links_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "saas_organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saas_org_user_links_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "saas_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_organisations: {
+        Row: {
+          active_users_count: number | null
+          billing_cycle: string | null
+          created_at: string | null
+          custom_domain: string | null
+          id: string
+          logo_url: string | null
+          max_users_allowed: number | null
+          name: string
+          next_billing_date: string | null
+          onboarding_completed: boolean | null
+          plan_name: string | null
+          status: string | null
+          stripe_customer_id: string | null
+          subscription_plan_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_users_count?: number | null
+          billing_cycle?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          id?: string
+          logo_url?: string | null
+          max_users_allowed?: number | null
+          name: string
+          next_billing_date?: string | null
+          onboarding_completed?: boolean | null
+          plan_name?: string | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          subscription_plan_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_users_count?: number | null
+          billing_cycle?: string | null
+          created_at?: string | null
+          custom_domain?: string | null
+          id?: string
+          logo_url?: string | null
+          max_users_allowed?: number | null
+          name?: string
+          next_billing_date?: string | null
+          onboarding_completed?: boolean | null
+          plan_name?: string | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          subscription_plan_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_organisations_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_system_logs: {
+        Row: {
+          description: string | null
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          performed_by: string | null
+          timestamp: string | null
+        }
+        Insert: {
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          timestamp?: string | null
+        }
+        Update: {
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_system_logs_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "saas_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_usage_metrics: {
+        Row: {
+          id: string
+          metadata: Json | null
+          metric_type: string
+          metric_unit: string | null
+          metric_value: number
+          organisation_id: string | null
+          recorded_at: string | null
+        }
+        Insert: {
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          metric_unit?: string | null
+          metric_value: number
+          organisation_id?: string | null
+          recorded_at?: string | null
+        }
+        Update: {
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          metric_unit?: string | null
+          metric_value?: number
+          organisation_id?: string | null
+          recorded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_usage_metrics_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "saas_organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_users: {
+        Row: {
+          auth_user_id: string | null
+          created_at: string | null
+          email: string
+          global_status: string | null
+          id: string
+          last_login_at: string | null
+          multi_org: boolean | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auth_user_id?: string | null
+          created_at?: string | null
+          email: string
+          global_status?: string | null
+          id?: string
+          last_login_at?: string | null
+          multi_org?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auth_user_id?: string | null
+          created_at?: string | null
+          email?: string
+          global_status?: string | null
+          id?: string
+          last_login_at?: string | null
+          multi_org?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      saas_webhooks: {
+        Row: {
+          created_at: string | null
+          event_triggers: string[] | null
+          id: string
+          last_triggered_at: string | null
+          organisation_id: string | null
+          retry_count: number | null
+          secret: string
+          status: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_triggers?: string[] | null
+          id?: string
+          last_triggered_at?: string | null
+          organisation_id?: string | null
+          retry_count?: number | null
+          secret: string
+          status?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          event_triggers?: string[] | null
+          id?: string
+          last_triggered_at?: string | null
+          organisation_id?: string | null
+          retry_count?: number | null
+          secret?: string
+          status?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saas_webhooks_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "saas_organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saas_worker_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          job_type: string
+          last_error: string | null
+          max_retries: number | null
+          payload: Json | null
+          retries: number | null
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          job_type: string
+          last_error?: string | null
+          max_retries?: number | null
+          payload?: Json | null
+          retries?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          job_type?: string
+          last_error?: string | null
+          max_retries?: number | null
+          payload?: Json | null
+          retries?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           created_at: string | null
@@ -953,11 +1519,12 @@ export type Database = {
           display_name: string
           features: Json
           id: string
-          is_active: boolean | null
+          max_storage_mb: number | null
           max_tools: number
           max_users: number
           monthly_price: number
           plan_name: string
+          plan_tier: string | null
           sort_order: number | null
           updated_at: string | null
           yearly_price: number
@@ -968,11 +1535,12 @@ export type Database = {
           display_name: string
           features?: Json
           id?: string
-          is_active?: boolean | null
+          max_storage_mb?: number | null
           max_tools?: number
           max_users?: number
           monthly_price?: number
           plan_name: string
+          plan_tier?: string | null
           sort_order?: number | null
           updated_at?: string | null
           yearly_price?: number
@@ -983,11 +1551,12 @@ export type Database = {
           display_name?: string
           features?: Json
           id?: string
-          is_active?: boolean | null
+          max_storage_mb?: number | null
           max_tools?: number
           max_users?: number
           monthly_price?: number
           plan_name?: string
+          plan_tier?: string | null
           sort_order?: number | null
           updated_at?: string | null
           yearly_price?: number
@@ -996,39 +1565,42 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          amount: number | null
           created_at: string | null
           id: string
-          limits: Json | null
+          next_billing_date: string | null
           organisation_id: string
+          period: string | null
           plan_id: string | null
           plan_name: string
           renewal_date: string | null
           status: string | null
-          trial_end_date: string | null
           updated_at: string | null
         }
         Insert: {
+          amount?: number | null
           created_at?: string | null
           id?: string
-          limits?: Json | null
+          next_billing_date?: string | null
           organisation_id: string
+          period?: string | null
           plan_id?: string | null
           plan_name: string
           renewal_date?: string | null
           status?: string | null
-          trial_end_date?: string | null
           updated_at?: string | null
         }
         Update: {
+          amount?: number | null
           created_at?: string | null
           id?: string
-          limits?: Json | null
+          next_billing_date?: string | null
           organisation_id?: string
+          period?: string | null
           plan_id?: string | null
           plan_name?: string
           renewal_date?: string | null
           status?: string | null
-          trial_end_date?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1047,6 +1619,368 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscriptions_licenses: {
+        Row: {
+          assigned_date: string | null
+          assigned_to_device_id: string | null
+          assigned_to_user_id: string | null
+          created_at: string | null
+          created_by: string | null
+          expiry_date: string | null
+          id: string
+          license_key: string | null
+          organisation_id: string
+          status: string | null
+          tool_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_date?: string | null
+          assigned_to_device_id?: string | null
+          assigned_to_user_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          license_key?: string | null
+          organisation_id: string
+          status?: string | null
+          tool_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_date?: string | null
+          assigned_to_device_id?: string | null
+          assigned_to_user_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          license_key?: string | null
+          organisation_id?: string
+          status?: string | null
+          tool_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_licenses_assigned_to_user_id_fkey"
+            columns: ["assigned_to_user_id"]
+            isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_licenses_assigned_to_user_id_fkey"
+            columns: ["assigned_to_user_id"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_licenses_assigned_to_user_id_fkey"
+            columns: ["assigned_to_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_licenses_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_licenses_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions_payments: {
+        Row: {
+          amount: number
+          billing_period_end: string
+          billing_period_start: string
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          id: string
+          invoice_url: string | null
+          organisation_id: string
+          payment_date: string | null
+          payment_method: string | null
+          status: string | null
+          tool_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          billing_period_end: string
+          billing_period_start: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          invoice_url?: string | null
+          organisation_id: string
+          payment_date?: string | null
+          payment_method?: string | null
+          status?: string | null
+          tool_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          billing_period_end?: string
+          billing_period_start?: string
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          invoice_url?: string | null
+          organisation_id?: string
+          payment_date?: string | null
+          payment_method?: string | null
+          status?: string | null
+          tool_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_payments_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_payments_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions_reminders: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          organisation_id: string
+          reminder_date: string
+          reminder_type: string | null
+          tool_id: string
+          triggered: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          organisation_id: string
+          reminder_date: string
+          reminder_type?: string | null
+          tool_id: string
+          triggered?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          organisation_id?: string
+          reminder_date?: string
+          reminder_type?: string | null
+          tool_id?: string
+          triggered?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_reminders_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_reminders_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions_tools: {
+        Row: {
+          auto_renew: boolean | null
+          billing_cycle_months: number | null
+          category: string | null
+          contract_file_id: string | null
+          cost: number
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          department_id: string | null
+          id: string
+          invoice_folder_id: string | null
+          license_count: number | null
+          next_billing_date: string | null
+          notes: string | null
+          organisation_id: string
+          renewal_date: string | null
+          status: string | null
+          subscription_type: string | null
+          tool_name: string
+          updated_at: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          billing_cycle_months?: number | null
+          category?: string | null
+          contract_file_id?: string | null
+          cost?: number
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          department_id?: string | null
+          id?: string
+          invoice_folder_id?: string | null
+          license_count?: number | null
+          next_billing_date?: string | null
+          notes?: string | null
+          organisation_id: string
+          renewal_date?: string | null
+          status?: string | null
+          subscription_type?: string | null
+          tool_name: string
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          auto_renew?: boolean | null
+          billing_cycle_months?: number | null
+          category?: string | null
+          contract_file_id?: string | null
+          cost?: number
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          department_id?: string | null
+          id?: string
+          invoice_folder_id?: string | null
+          license_count?: number | null
+          next_billing_date?: string | null
+          notes?: string | null
+          organisation_id?: string
+          renewal_date?: string | null
+          status?: string | null
+          subscription_type?: string | null
+          tool_name?: string
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_tools_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_tools_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions_vendors: {
+        Row: {
+          address: Json | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          notes: string | null
+          organisation_id: string
+          phone: string | null
+          updated_at: string | null
+          vendor_name: string
+          website: string | null
+        }
+        Insert: {
+          address?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          notes?: string | null
+          organisation_id: string
+          phone?: string | null
+          updated_at?: string | null
+          vendor_name: string
+          website?: string | null
+        }
+        Update: {
+          address?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          notes?: string | null
+          organisation_id?: string
+          phone?: string | null
+          updated_at?: string | null
+          vendor_name?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_vendors_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_admin_users: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          permissions: string[] | null
+          role: Database["public"]["Enums"]["super_admin_role"]
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: string[] | null
+          role: Database["public"]["Enums"]["super_admin_role"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: string[] | null
+          role?: Database["public"]["Enums"]["super_admin_role"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       team_groups: {
         Row: {
@@ -1199,6 +2133,20 @@ export type Database = {
             foreignKeyName: "tickets_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -1249,6 +2197,20 @@ export type Database = {
             foreignKeyName: "user_permissions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "individual_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "organization_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -1259,32 +2221,24 @@ export type Database = {
           created_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
-          tenant_id: number
+          tenant_id: number | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
-          tenant_id: number
+          tenant_id?: number | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          tenant_id?: number
+          tenant_id?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_roles_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_sessions: {
         Row: {
@@ -1325,36 +2279,45 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          is_superadmin: boolean | null
           last_login: string | null
           name: string | null
           organisation_id: string
+          phone: string | null
           role: string | null
           status: string | null
           updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
         }
         Insert: {
           auth_user_id?: string | null
           created_at?: string | null
           email: string
           id?: string
+          is_superadmin?: boolean | null
           last_login?: string | null
           name?: string | null
           organisation_id: string
+          phone?: string | null
           role?: string | null
           status?: string | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Update: {
           auth_user_id?: string | null
           created_at?: string | null
           email?: string
           id?: string
+          is_superadmin?: boolean | null
           last_login?: string | null
           name?: string | null
           organisation_id?: string
+          phone?: string | null
           role?: string | null
           status?: string | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
         }
         Relationships: [
           {
@@ -1368,19 +2331,154 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      individual_users: {
+        Row: {
+          account_name: string | null
+          auth_user_id: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          is_superadmin: boolean | null
+          last_login: string | null
+          name: string | null
+          organisation_id: string | null
+          phone: string | null
+          role: string | null
+          status: string | null
+          updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_users: {
+        Row: {
+          account_type: string | null
+          auth_user_id: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          is_superadmin: boolean | null
+          last_login: string | null
+          name: string | null
+          organisation_id: string | null
+          organisation_name: string | null
+          phone: string | null
+          role: string | null
+          status: string | null
+          updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       can_activate_tool: { Args: { org_id: string }; Returns: boolean }
+      can_add_user: { Args: { org_id: string }; Returns: boolean }
+      can_enable_tool: { Args: { org_id: string }; Returns: boolean }
       can_invite_user: { Args: { org_id: string }; Returns: boolean }
+      check_subscription_expiry: { Args: never; Returns: undefined }
       check_subscription_limit: {
         Args: { limit_type: string; org_id: string }
         Returns: boolean
       }
       generate_invitation_token: { Args: never; Returns: string }
+      get_appmaster_admin_details: {
+        Args: never
+        Returns: {
+          admin_role: string
+          created_at: string
+          created_by: string
+          email: string
+          id: string
+          is_active: boolean
+          last_login: string
+          name: string
+          permissions: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      get_appmaster_role: { Args: { _user_id: string }; Returns: string }
+      get_current_subscription: {
+        Args: { org_id: string }
+        Returns: {
+          features: Json
+          id: string
+          max_tools: number
+          max_users: number
+          next_billing_date: string
+          plan_id: string
+          plan_name: string
+          renewal_date: string
+          status: string
+        }[]
+      }
+      get_license_usage: {
+        Args: { tool_id_param: string }
+        Returns: {
+          assigned_licenses: number
+          available_licenses: number
+          total_licenses: number
+          usage_percentage: number
+        }[]
+      }
+      get_monthly_burn_rate: { Args: { org_id: string }; Returns: number }
+      get_subscription_limits: {
+        Args: { org_id: string }
+        Returns: {
+          current_tools: number
+          current_users: number
+          days_until_renewal: number
+          features: Json
+          max_tools: number
+          max_users: number
+          status: string
+        }[]
+      }
+      get_upcoming_renewals: {
+        Args: { days_ahead?: number; org_id: string }
+        Returns: {
+          cost: number
+          days_until_renewal: number
+          renewal_date: string
+          tool_id: string
+          tool_name: string
+          vendor_name: string
+        }[]
+      }
+      get_user_account_type: { Args: never; Returns: string }
       get_user_org: { Args: never; Returns: string }
+      get_user_org_fallback: { Args: never; Returns: string }
       get_user_tenant: { Args: { _user_id: string }; Returns: number }
+      has_any_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_feature: {
+        Args: { feature_key: string; org_id: string }
+        Returns: boolean
+      }
+      has_feature_access: {
         Args: { feature_key: string; org_id: string }
         Returns: boolean
       }
@@ -1391,14 +2489,30 @@ export type Database = {
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
-          _tenant_id: number
           _user_id: string
         }
         Returns: boolean
       }
+      has_super_admin_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
+      is_appmaster_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      verify_account_type: {
+        Args: { _account_type: string; _email: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      app_role: "super_admin" | "admin" | "manager" | "user"
+      app_role: "owner" | "admin" | "manager" | "staff" | "viewer"
+      super_admin_role:
+        | "super_admin"
+        | "saas_manager"
+        | "saas_support_agent"
+        | "billing_manager"
+        | "read_only_auditor"
+      user_type: "individual" | "organization" | "appmaster_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1526,7 +2640,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "admin", "manager", "user"],
+      app_role: ["owner", "admin", "manager", "staff", "viewer"],
+      super_admin_role: [
+        "super_admin",
+        "saas_manager",
+        "saas_support_agent",
+        "billing_manager",
+        "read_only_auditor",
+      ],
+      user_type: ["individual", "organization", "appmaster_admin"],
     },
   },
 } as const
