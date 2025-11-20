@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { AddIndividualUserDialog } from "./AddIndividualUserDialog";
 
 export const IndividualUsersTable = () => {
   const [users, setUsers] = useState<any[]>([]);
@@ -16,6 +17,7 @@ export const IndividualUsersTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const [searchParams] = useSearchParams();
   const orgFilter = searchParams.get("org");
 
@@ -160,11 +162,17 @@ export const IndividualUsersTable = () => {
         <Button onClick={fetchUsers} variant="outline" size="sm">
           Refresh
         </Button>
-        <Button size="sm">
+        <Button size="sm" onClick={() => setShowAddDialog(true)}>
           <UserPlus className="w-4 h-4 mr-1" />
           Add User
         </Button>
       </div>
+
+      <AddIndividualUserDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        onUserAdded={fetchUsers}
+      />
 
       {selectedUsers.size > 0 && (
         <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg border animate-in slide-in-from-top-2 duration-200">
