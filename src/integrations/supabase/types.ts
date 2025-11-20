@@ -2439,6 +2439,39 @@ export type Database = {
           },
         ]
       }
+      user_recovery_options: {
+        Row: {
+          created_at: string
+          id: string
+          recovery_email: string | null
+          recovery_email_verified: boolean | null
+          recovery_phone: string | null
+          recovery_phone_verified: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recovery_email?: string | null
+          recovery_email_verified?: boolean | null
+          recovery_phone?: string | null
+          recovery_phone_verified?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recovery_email?: string | null
+          recovery_email_verified?: boolean | null
+          recovery_phone?: string | null
+          recovery_phone_verified?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
