@@ -67,6 +67,7 @@ import SuperAdminLogs from "./pages/super-admin/logs";
 import SuperAdminContactSubmissions from "./pages/super-admin/contact-submissions";
 import SuperAdminBroadcasts from "./pages/super-admin/broadcasts";
 import { BroadcastBanner } from "./components/BroadcastBanner";
+import Navbar from "./components/Navbar";
 import AppDetailPage from "./pages/apps/[slug]";
 
 const queryClient = new QueryClient({
@@ -88,7 +89,9 @@ const App = () => {
           <AuthProvider>
             <OrganisationProvider>
               <BroadcastBanner />
-              <Routes>
+              <Navbar />
+              <div className="pt-14">
+                <Routes>
                   <Route path="/" element={<Landing />} />
                   <Route path="/apps/:slug" element={<AppDetailPage />} />
                   
@@ -160,6 +163,7 @@ const App = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+              </div>
             </OrganisationProvider>
           </AuthProvider>
       </BrowserRouter>
