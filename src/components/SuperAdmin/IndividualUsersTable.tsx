@@ -40,6 +40,13 @@ export const IndividualUsersTable = () => {
     setLoading(true);
     setError(null);
     try {
+      // First get all appmaster admin user IDs to exclude them
+      const { data: adminData } = await supabase
+        .from("appmaster_admins")
+        .select("user_id");
+      
+      const adminUserIds = adminData?.map(a => a.user_id) || [];
+
       let query = supabase
         .from("users")
         .select(`
@@ -50,6 +57,11 @@ export const IndividualUsersTable = () => {
           )
         `)
         .eq("user_type", "individual");
+
+      // Exclude appmaster admins
+      if (adminUserIds.length > 0) {
+        query = query.not("auth_user_id", "in", `(${adminUserIds.join(",")})`);
+      }
 
       if (orgFilter) {
         query = query.eq("organisation_id", orgFilter);

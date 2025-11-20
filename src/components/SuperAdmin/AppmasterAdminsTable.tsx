@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Search, Shield, Edit, Trash2, UserX, UserCheck, Eye, Key, ShieldCheck } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { MoreHorizontal, Search, Shield, Edit, Trash2, UserX, UserCheck, Eye, Key, ShieldCheck, Download, Ban, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
@@ -17,18 +18,21 @@ import {
 import { EditAdminDialog } from "./EditAdminDialog";
 import { ViewAdminDetailsDialog } from "./ViewAdminDetailsDialog";
 import { DeleteAdminDialog } from "./DeleteAdminDialog";
+import { AddAdminDialog } from "./AddAdminDialog";
 
 export const AppmasterAdminsTable = () => {
   const [admins, setAdmins] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAdmins, setSelectedAdmins] = useState<Set<string>>(new Set());
   
   // Dialog states
   const [selectedAdmin, setSelectedAdmin] = useState<any | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchAdmins();
@@ -61,6 +65,84 @@ export const AppmasterAdminsTable = () => {
     admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     admin.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const toggleSelectAll = () => {
+    if (selectedAdmins.size === filteredAdmins.length) {
+      setSelectedAdmins(new Set());
+    } else {
+      setSelectedAdmins(new Set(filteredAdmins.map(a => a.id)));
+    }
+  };
+
+  const toggleSelectAdmin = (adminId: string) => {
+    const newSelected = new Set(selectedAdmins);
+    if (newSelected.has(adminId)) {
+      newSelected.delete(adminId);
+    } else {
+      newSelected.add(adminId);
+    }
+    setSelectedAdmins(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedAdmins.size === 0) return;
+    if (!confirm(`Delete ${selectedAdmins.size} admin(s)?`)) return;
+    
+    try {
+      const { error } = await supabase
+        .from("appmaster_admins")
+        .delete()
+        .in("id", Array.from(selectedAdmins));
+      
+      if (error) throw error;
+      toast.success(`Deleted ${selectedAdmins.size} admin(s)`);
+      setSelectedAdmins(new Set());
+      fetchAdmins();
+    } catch (error: any) {
+      toast.error("Failed to delete admins: " + error.message);
+    }
+  };
+
+  const handleBulkStatusChange = async (isActive: boolean) => {
+    if (selectedAdmins.size === 0) return;
+    
+    try {
+      const { error } = await supabase
+        .from("appmaster_admins")
+        .update({ is_active: isActive })
+        .in("id", Array.from(selectedAdmins));
+      
+      if (error) throw error;
+      toast.success(`Updated ${selectedAdmins.size} admin(s) status`);
+      setSelectedAdmins(new Set());
+      fetchAdmins();
+    } catch (error: any) {
+      toast.error("Failed to update admins: " + error.message);
+    }
+  };
+
+  const handleBulkExport = () => {
+    const selectedAdminsData = admins.filter(a => selectedAdmins.has(a.id));
+    const csv = [
+      ["Name", "Email", "Role", "Status", "Last Login", "Created"],
+      ...selectedAdminsData.map(a => [
+        a.name || "-",
+        a.email,
+        a.admin_role,
+        a.is_active ? "Active" : "Inactive",
+        a.last_login ? new Date(a.last_login).toLocaleDateString() : "Never",
+        new Date(a.created_at).toLocaleDateString()
+      ])
+    ].map(row => row.join(",")).join("\n");
+    
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `appmaster-admins-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    toast.success(`Exported ${selectedAdmins.size} admin(s)`);
+  };
 
   const handleEditAdmin = (admin: any) => {
     setSelectedAdmin(admin);
@@ -136,7 +218,35 @@ export const AppmasterAdminsTable = () => {
         <Button onClick={fetchAdmins} variant="outline" size="sm">
           Refresh
         </Button>
+        <Button size="sm" onClick={() => setAddDialogOpen(true)}>
+          <UserPlus className="w-4 h-4 mr-1" />
+          Add Admin
+        </Button>
       </div>
+
+      {selectedAdmins.size > 0 && (
+        <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg border animate-in slide-in-from-top-2 duration-200">
+          <span className="text-sm font-medium">{selectedAdmins.size} selected</span>
+          <div className="flex gap-2 ml-auto">
+            <Button size="sm" variant="outline" onClick={handleBulkExport}>
+              <Download className="w-4 h-4 mr-1" />
+              Export
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange(false)}>
+              <Ban className="w-4 h-4 mr-1" />
+              Deactivate
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange(true)}>
+              <UserCheck className="w-4 h-4 mr-1" />
+              Activate
+            </Button>
+            <Button size="sm" variant="destructive" onClick={handleBulkDelete}>
+              <Trash2 className="w-4 h-4 mr-1" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
@@ -148,6 +258,12 @@ export const AppmasterAdminsTable = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedAdmins.size === filteredAdmins.length && filteredAdmins.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead>
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4" />
@@ -179,6 +295,12 @@ export const AppmasterAdminsTable = () => {
             ) : (
               filteredAdmins.map((admin) => (
                 <TableRow key={admin.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedAdmins.has(admin.id)}
+                      onCheckedChange={() => toggleSelectAdmin(admin.id)}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{admin.name}</TableCell>
                   <TableCell>{admin.email}</TableCell>
                   <TableCell>
@@ -280,6 +402,12 @@ export const AppmasterAdminsTable = () => {
         admin={selectedAdmin}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+        onSuccess={fetchAdmins}
+      />
+
+      <AddAdminDialog
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
         onSuccess={fetchAdmins}
       />
     </div>
