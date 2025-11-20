@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrganisation } from "@/contexts/OrganisationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Mail, Shield } from "lucide-react";
+import { Mail, Shield } from "lucide-react";
+import { InviteUserDialog } from "./InviteUserDialog";
+import { EditUserDialog } from "./EditUserDialog";
 import {
   Table,
   TableBody,
@@ -16,8 +19,10 @@ import {
 
 export function UserManagement() {
   const { organisation } = useOrganisation();
+  const [editUser, setEditUser] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading, refetch } = useQuery({
     queryKey: ["org-users", organisation?.id],
     queryFn: async () => {
       if (!organisation?.id) return [];
@@ -43,10 +48,7 @@ export function UserManagement() {
             Manage users and their roles in your organization
           </p>
         </div>
-        <Button>
-          <UserPlus className="w-4 h-4 mr-2" />
-          Invite User
-        </Button>
+        <InviteUserDialog />
       </div>
 
       <Card>
@@ -94,7 +96,14 @@ export function UserManagement() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditUser(user);
+                          setEditDialogOpen(true);
+                        }}
+                      >
                         Edit
                       </Button>
                     </TableCell>
@@ -109,6 +118,13 @@ export function UserManagement() {
           )}
         </CardContent>
       </Card>
+
+      <EditUserDialog
+        user={editUser}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={refetch}
+      />
     </div>
   );
 }
