@@ -9,7 +9,6 @@ import { OrganisationProvider } from "./contexts/OrganisationContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
 import { DashboardRedirect } from "./components/DashboardRedirect";
-import { Layout } from "./components/Layout";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import IndividualDashboard from "./pages/dashboard/individual";
@@ -90,7 +89,6 @@ const App = () => {
             <OrganisationProvider>
               <BroadcastBanner />
               <Routes>
-                <Route element={<Layout />}>
                   <Route path="/" element={<Landing />} />
                   <Route path="/apps/:slug" element={<AppDetailPage />} />
                   
@@ -108,61 +106,60 @@ const App = () => {
                   {/* Legacy route - redirects to appropriate dashboard */}
                   <Route path="/index" element={<ProtectedRoute><DashboardRedirect /></ProtectedRoute>} />
           
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/auth/confirm" element={<AuthConfirm />} />
-                  <Route path="/password-reset" element={<PasswordReset />} />
-                  <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
-                  <Route path="/accept-invitation" element={<AcceptInvitation />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/profile/personal-info" element={<PersonalInfo />} />
-                  <Route path="/profile/security" element={<Security />} />
-                  <Route path="/profile/payments" element={<Payments />} />
-                  <Route path="/settings" element={<Profile />} />
-                  <Route path="/initialize-admin" element={<InitializeAdmin />} />
-                  <Route path="/depreciation" element={<Depreciation />} />
-                  <Route path="/invoicing" element={<Invoicing />} />
-                  <Route path="/attendance" element={<Attendance />} />
-                  <Route path="/recruitment" element={<Recruitment />} />
-                  <Route path="/tickets" element={<Tickets />} />
-                  <Route path="/subscriptions" element={<Subscriptions />}>
-                    <Route index element={<SubscriptionsDashboardPage />} />
-                    <Route path="tools" element={<SubscriptionsToolsPage />} />
-                    <Route path="vendors" element={<SubscriptionsVendorsPage />} />
-                    <Route path="licenses" element={<SubscriptionsLicensesPage />} />
-                    <Route path="payments" element={<SubscriptionsPaymentsPage />} />
-                  </Route>
-                  <Route path="/assets" element={<Assets />} />
-                  <Route path="/shop-income-expense" element={<ShopIncomeExpense />} />
-                  <Route path="/inventory" element={<Inventory />} />
-                  <Route path="/crm" element={<CRM />} />
-                  <Route path="/crm/leads" element={<LeadsListPage />} />
-                  <Route path="/crm/leads/new" element={<NewLeadPage />} />
-                  <Route path="/crm/customers" element={<CustomersListPage />} />
-                  <Route path="/crm/opportunities" element={<OpportunitiesPage />} />
-                  <Route path="/crm/quotes" element={<QuotesListPage />} />
-                  <Route path="/marketing" element={<Marketing />} />
-                  <Route path="/personal-expense" element={<PersonalExpense />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                  <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>}>
-                    <Route index element={<SuperAdminDashboard />} />
-                    <Route path="organisations" element={<SuperAdminOrganisations />} />
-                    <Route path="users" element={<SuperAdminUsers />} />
-                    <Route path="plans" element={<SuperAdminPlans />} />
-                    <Route path="usage" element={<SuperAdminUsage />} />
-                    <Route path="logs" element={<SuperAdminLogs />} />
-                    <Route path="features" element={<SuperAdminFeatures />} />
-                    <Route path="api-keys" element={<SuperAdminAPIKeys />} />
-                    <Route path="jobs" element={<SuperAdminJobs />} />
-                    <Route path="admins" element={<SuperAdminAdmins />} />
-                    <Route path="contact-submissions" element={<SuperAdminContactSubmissions />} />
-                    <Route path="broadcasts" element={<SuperAdminBroadcasts />} />
-                    <Route path="settings" element={<SuperAdminSettings />} />
-                  </Route>
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/confirm" element={<AuthConfirm />} />
+          <Route path="/password-reset" element={<PasswordReset />} />
+          <Route path="/reset-password-confirm" element={<ResetPasswordConfirm />} />
+          <Route path="/accept-invitation" element={<AcceptInvitation />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/personal-info" element={<PersonalInfo />} />
+          <Route path="/profile/security" element={<Security />} />
+          <Route path="/profile/payments" element={<Payments />} />
+          <Route path="/settings" element={<Profile />} />
+          <Route path="/initialize-admin" element={<InitializeAdmin />} />
+          <Route path="/depreciation" element={<Depreciation />} />
+          <Route path="/invoicing" element={<Invoicing />} />
+          <Route path="/attendance" element={<Attendance />} />
+          <Route path="/recruitment" element={<Recruitment />} />
+          <Route path="/tickets" element={<Tickets />} />
+          <Route path="/subscriptions" element={<Subscriptions />}>
+            <Route index element={<SubscriptionsDashboardPage />} />
+            <Route path="tools" element={<SubscriptionsToolsPage />} />
+            <Route path="vendors" element={<SubscriptionsVendorsPage />} />
+            <Route path="licenses" element={<SubscriptionsLicensesPage />} />
+            <Route path="payments" element={<SubscriptionsPaymentsPage />} />
+          </Route>
+          <Route path="/assets" element={<Assets />} />
+          <Route path="/shop-income-expense" element={<ShopIncomeExpense />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/crm" element={<CRM />} />
+          <Route path="/crm/leads" element={<LeadsListPage />} />
+          <Route path="/crm/leads/new" element={<NewLeadPage />} />
+          <Route path="/crm/customers" element={<CustomersListPage />} />
+          <Route path="/crm/opportunities" element={<OpportunitiesPage />} />
+          <Route path="/crm/quotes" element={<QuotesListPage />} />
+          <Route path="/marketing" element={<Marketing />} />
+          <Route path="/personal-expense" element={<PersonalExpense />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/super-admin" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>}>
+            <Route index element={<SuperAdminDashboard />} />
+            <Route path="organisations" element={<SuperAdminOrganisations />} />
+            <Route path="users" element={<SuperAdminUsers />} />
+            <Route path="plans" element={<SuperAdminPlans />} />
+            <Route path="usage" element={<SuperAdminUsage />} />
+            <Route path="logs" element={<SuperAdminLogs />} />
+            <Route path="features" element={<SuperAdminFeatures />} />
+            <Route path="api-keys" element={<SuperAdminAPIKeys />} />
+            <Route path="jobs" element={<SuperAdminJobs />} />
+            <Route path="admins" element={<SuperAdminAdmins />} />
+            <Route path="contact-submissions" element={<SuperAdminContactSubmissions />} />
+            <Route path="broadcasts" element={<SuperAdminBroadcasts />} />
+            <Route path="settings" element={<SuperAdminSettings />} />
+          </Route>
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
             </OrganisationProvider>
           </AuthProvider>
       </BrowserRouter>
