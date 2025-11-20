@@ -64,12 +64,8 @@ export const AddToolsDialog = ({ open, onOpenChange, selectedTools, onToolsUpdat
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          selected_tools: tempSelectedTools
-        }, {
-          onConflict: 'id'
-        });
+        .update({ selected_tools: tempSelectedTools } as any)
+        .eq('id', user.id);
 
       if (error) throw error;
 
