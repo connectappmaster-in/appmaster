@@ -37,13 +37,14 @@ serve(async (req) => {
     }
 
     // Check if user is super admin
-    const { data: userData, error: checkError } = await supabaseAdmin
-      .from('users')
-      .select('is_superadmin')
-      .eq('auth_user_id', user.id)
+    const { data: adminData, error: checkError } = await supabaseAdmin
+      .from('appmaster_admins')
+      .select('admin_role, is_active')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
       .single();
 
-    if (checkError || !userData?.is_superadmin) {
+    if (checkError || !adminData || !['super_admin', 'admin'].includes(adminData.admin_role)) {
       throw new Error('Unauthorized: Not a super admin');
     }
 
