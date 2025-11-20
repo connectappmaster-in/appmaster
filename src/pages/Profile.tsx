@@ -12,68 +12,56 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
 import { ProfileCard } from "@/components/Profile/ProfileCard";
-import {
-  Loader2,
-  Mail,
-  Shield,
-  Lock,
-  Search,
-  Key,
-  Smartphone,
-  Activity,
-  Eye,
-  Settings,
-  AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
-
+import { Loader2, Mail, Shield, Lock, Search, Key, Smartphone, Activity, Eye, Settings, AlertCircle, CheckCircle2 } from "lucide-react";
 const Profile = () => {
-  const { user, userType } = useAuth();
-  const { organisation } = useOrganisation();
-  const { toast } = useToast();
+  const {
+    user,
+    userType
+  } = useAuth();
+  const {
+    organisation
+  } = useOrganisation();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isAppmasterAdmin = userType === "appmaster_admin";
-
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone: ""
   });
-
   const {
     data: userData,
     isLoading,
-    isFetching,
+    isFetching
   } = useQuery({
     queryKey: ["user-profile", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("auth_user_id", user?.id)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from("users").select("*").eq("auth_user_id", user?.id).maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
-
-  const { data: profile } = useQuery({
+  const {
+    data: profile
+  } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user?.id)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from("profiles").select("*").eq("id", user?.id).maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id
   });
 
   // Keep local form state in sync with latest server data
@@ -83,64 +71,57 @@ const Profile = () => {
         setFormData({
           name: userData.name || "",
           email: userData.email || "",
-          phone: userData.phone || "",
+          phone: userData.phone || ""
         });
       } else if (user) {
         setFormData({
           name: (user.user_metadata as any)?.name || user.email || "",
           email: user.email || "",
-          phone: (user.user_metadata as any)?.phone || "",
+          phone: (user.user_metadata as any)?.phone || ""
         });
       }
     }
   }, [userData, isEditing, user]);
-
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { name: string; phone: string }) => {
+    mutationFn: async (data: {
+      name: string;
+      phone: string;
+    }) => {
       // Special handling for Appmaster admins: store profile info in auth metadata
       if (isAppmasterAdmin) {
-        const { data: authResult, error: authError } = await supabase.auth.updateUser({
+        const {
+          data: authResult,
+          error: authError
+        } = await supabase.auth.updateUser({
           data: {
             name: data.name,
-            phone: data.phone,
-          },
+            phone: data.phone
+          }
         });
-
         if (authError) throw authError;
 
         // Best-effort sync phone to saas_users (ignore errors)
         if (user?.id) {
-          await supabase
-            .from("saas_users")
-            .update({ phone: data.phone })
-            .eq("auth_user_id", user.id);
+          await supabase.from("saas_users").update({
+            phone: data.phone
+          }).eq("auth_user_id", user.id);
         }
-
         const updatedUser = authResult?.user ?? user;
-
         return {
-          name:
-            ((updatedUser?.user_metadata as any)?.name as string) ||
-            updatedUser?.email ||
-            data.name,
-          phone:
-            ((updatedUser?.user_metadata as any)?.phone as string) ||
-            data.phone,
-          email: updatedUser?.email || "",
+          name: (updatedUser?.user_metadata as any)?.name as string || updatedUser?.email || data.name,
+          phone: (updatedUser?.user_metadata as any)?.phone as string || data.phone,
+          email: updatedUser?.email || ""
         };
       }
 
       // For regular users, update the users table
-      const { data: updated, error: updateError } = await supabase
-        .from("users")
-        .update({
-          name: data.name,
-          phone: data.phone,
-        })
-        .eq("auth_user_id", user?.id)
-        .select("id, name, phone, email")
-        .maybeSingle();
-
+      const {
+        data: updated,
+        error: updateError
+      } = await supabase.from("users").update({
+        name: data.name,
+        phone: data.phone
+      }).eq("auth_user_id", user?.id).select("id, name, phone, email").maybeSingle();
       if (updateError) throw updateError;
 
       // If no existing row, create one using organisation context if available
@@ -149,73 +130,60 @@ const Profile = () => {
 
         // If no organisation (e.g. AppMaster admins), fall back to auth profile only
         if (!orgId) {
-          const { data: authResult, error: authError } = await supabase.auth.updateUser({
+          const {
+            data: authResult,
+            error: authError
+          } = await supabase.auth.updateUser({
             data: {
               name: data.name,
-              phone: data.phone,
-            },
+              phone: data.phone
+            }
           });
-
           if (authError) throw authError;
-
           if (user?.id) {
-            await supabase
-              .from("saas_users")
-              .update({ phone: data.phone })
-              .eq("auth_user_id", user.id);
+            await supabase.from("saas_users").update({
+              phone: data.phone
+            }).eq("auth_user_id", user.id);
           }
-
           const updatedUser = authResult?.user ?? user;
-
           return {
-            name:
-              ((updatedUser?.user_metadata as any)?.name as string) ||
-              updatedUser?.email ||
-              data.name,
-            phone:
-              ((updatedUser?.user_metadata as any)?.phone as string) ||
-              data.phone,
-            email: updatedUser?.email || "",
+            name: (updatedUser?.user_metadata as any)?.name as string || updatedUser?.email || data.name,
+            phone: (updatedUser?.user_metadata as any)?.phone as string || data.phone,
+            email: updatedUser?.email || ""
           };
         }
-
-        const { data: inserted, error: insertError } = await supabase
-          .from("users")
-          .insert({
-            auth_user_id: user?.id,
-            email: user?.email || data.name, // fallback
-            name: data.name,
-            phone: data.phone,
-            organisation_id: orgId,
-            status: "active",
-            role: "member",
-          })
-          .select("id, name, phone, email")
-          .single();
-
+        const {
+          data: inserted,
+          error: insertError
+        } = await supabase.from("users").insert({
+          auth_user_id: user?.id,
+          email: user?.email || data.name,
+          // fallback
+          name: data.name,
+          phone: data.phone,
+          organisation_id: orgId,
+          status: "active",
+          role: "member"
+        }).select("id, name, phone, email").single();
         if (insertError) throw insertError;
         return inserted;
       }
-
       return updated;
     },
-    onSuccess: async (result) => {
+    onSuccess: async result => {
       // Optimistically sync cache so UI updates instantly
-      queryClient.setQueryData([
-        "user-profile",
-        user?.id,
-      ], (prev: any) => ({
+      queryClient.setQueryData(["user-profile", user?.id], (prev: any) => ({
         ...(prev || {}),
         name: result.name,
         phone: result.phone,
-        email: result.email,
+        email: result.email
       }));
-
-      await queryClient.invalidateQueries({ queryKey: ["user-profile", user?.id] });
-
+      await queryClient.invalidateQueries({
+        queryKey: ["user-profile", user?.id]
+      });
       toast({
         title: "Profile updated",
-        description: "Your changes have been saved.",
+        description: "Your changes have been saved."
       });
       setIsEditing(false);
     },
@@ -223,63 +191,48 @@ const Profile = () => {
       toast({
         title: "Update failed",
         description: error.message || "Failed to update profile",
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
-
   const handleEdit = () => {
     setIsEditing(true);
   };
-
   const handleSave = () => {
     if (!formData.name.trim()) {
       toast({
         title: "Name required",
         description: "Please enter your full name before saving.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     updateProfileMutation.mutate({
       name: formData.name,
-      phone: formData.phone,
+      phone: formData.phone
     });
   };
-
   const handleCancel = () => {
     // Reset to latest server data
     if (userData) {
       setFormData({
         name: userData.name || "",
         email: userData.email || "",
-        phone: userData.phone || "",
+        phone: userData.phone || ""
       });
     }
     setIsEditing(false);
   };
-
   const getInitials = (name?: string) => {
     if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   };
-
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
+    return <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="flex min-h-screen bg-background">
+  return <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
       <ProfileSidebar />
 
@@ -309,88 +262,34 @@ const Profile = () => {
           <div className="max-w-2xl mx-auto">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search account settings"
-                className="pl-10 h-12 bg-muted/50"
-              />
+              
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Button variant="outline" className="gap-2">
-              <Key className="h-4 w-4" />
-              My password
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Smartphone className="h-4 w-4" />
-              Devices
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Lock className="h-4 w-4" />
-              Password Manager
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Activity className="h-4 w-4" />
-              My Activity
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Mail className="h-4 w-4" />
-              Email
-            </Button>
-          </div>
+          
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Profile & Personalization Card */}
-            <ProfileCard
-              title="Profile & personalization"
-              description="See your profile data and manage your account information"
-              icon={
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+            <ProfileCard title="Profile & personalization" description="See your profile data and manage your account information" icon={<div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
                   <Settings className="h-8 w-8 text-white" />
-                </div>
-              }
-              actionLabel="Manage your profile info"
-              onAction={() => navigate("/profile/personal-info")}
-            />
+                </div>} actionLabel="Manage your profile info" onAction={() => navigate("/profile/personal-info")} />
 
             {/* Security Tips Card */}
-            <ProfileCard
-              title="You have security recommendations"
-              description="Security issues found in your Security Checkup"
-              icon={
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+            <ProfileCard title="You have security recommendations" description="Security issues found in your Security Checkup" icon={<div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
                   <CheckCircle2 className="h-8 w-8 text-white" />
-                </div>
-              }
-              actionLabel="Review security tips"
-              onAction={() => navigate("/profile/security")}
-            />
+                </div>} actionLabel="Review security tips" onAction={() => navigate("/profile/security")} />
 
             {/* Privacy Settings Card */}
-            <ProfileCard
-              title="Privacy settings available"
-              description="Take the Privacy Checkup and choose the settings that are right for you"
-              icon={
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+            <ProfileCard title="Privacy settings available" description="Take the Privacy Checkup and choose the settings that are right for you" icon={<div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
                   <Eye className="h-8 w-8 text-white" />
-                </div>
-              }
-              actionLabel="Review privacy settings"
-              onAction={() => navigate("/profile/privacy")}
-            />
+                </div>} actionLabel="Review privacy settings" onAction={() => navigate("/profile/privacy")} />
 
             {/* Account Information Card */}
-            <ProfileCard
-              title="Account information"
-              description="View and manage your account details and preferences"
-              icon={
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+            <ProfileCard title="Account information" description="View and manage your account details and preferences" icon={<div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
                   <AlertCircle className="h-8 w-8 text-white" />
-                </div>
-              }
-            >
+                </div>}>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-muted-foreground">Email</span>
@@ -409,9 +308,7 @@ const Profile = () => {
                 <div className="flex justify-between py-2">
                   <span className="text-muted-foreground">Member Since</span>
                   <span className="font-medium">
-                    {userData?.created_at
-                      ? format(new Date(userData.created_at), "MMM dd, yyyy")
-                      : "-"}
+                    {userData?.created_at ? format(new Date(userData.created_at), "MMM dd, yyyy") : "-"}
                   </span>
                 </div>
               </div>
@@ -419,8 +316,6 @@ const Profile = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Profile;
