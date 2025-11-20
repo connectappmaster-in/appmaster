@@ -10,11 +10,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
+import { AddPaymentMethodDialog } from "@/components/Profile/AddPaymentMethodDialog";
+import { ChangePlanDialog } from "@/components/Profile/ChangePlanDialog";
 
 const Payments = () => {
   const { user } = useAuth();
   const { organisation } = useOrganisation();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [isAddPaymentDialogOpen, setIsAddPaymentDialogOpen] = useState(false);
+  const [isChangePlanDialogOpen, setIsChangePlanDialogOpen] = useState(false);
 
   // Fetch current subscription
   const { data: subscription, isLoading: isLoadingSubscription } = useQuery({
@@ -45,6 +48,23 @@ const Payments = () => {
       if (!organisation?.id) return [];
       const { data, error } = await supabase
         .from("saas_billing_history")
+        .select("*")
+        .eq("organisation_id", organisation.id)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!organisation?.id,
+  });
+
+  // Fetch payment methods
+  const { data: paymentMethods, isLoading: isLoadingPaymentMethods } = useQuery({
+    queryKey: ["payment-methods", organisation?.id],
+    queryFn: async () => {
+      if (!organisation?.id) return [];
+      const { data, error } = await supabase
+        .from("payment_methods")
         .select("*")
         .eq("organisation_id", organisation.id)
         .order("created_at", { ascending: false });
@@ -115,7 +135,9 @@ const Payments = () => {
                         </p>
                       )}
                     </div>
-                    <Button variant="outline">Change Plan</Button>
+                    <Button variant="outline" onClick={() => setIsChangePlanDialogOpen(true)}>
+                      Change Plan
+                    </Button>
                   </div>
 
                   <Separator />
@@ -175,34 +197,54 @@ const Payments = () => {
                   </CardTitle>
                   <CardDescription>Manage your payment methods</CardDescription>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIsAddPaymentDialogOpen(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Method
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {/* Placeholder for payment methods */}
-                <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-medium">•••• •••• •••• 4242</p>
-                        <p className="text-sm text-muted-foreground">Expires 12/25</p>
+              {isLoadingPaymentMethods ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading payment methods...
+                </div>
+              ) : paymentMethods && paymentMethods.length > 0 ? (
+                <div className="space-y-3">
+                  {paymentMethods.map((method) => (
+                    <div
+                      key={method.id}
+                      className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                            <CreditCard className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              •••• •••• •••• {method.card_last4}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Expires {method.card_exp_month}/{method.card_exp_year}
+                            </p>
+                          </div>
+                        </div>
+                        {method.is_default && (
+                          <Badge variant="secondary">Default</Badge>
+                        )}
                       </div>
                     </div>
-                    <Badge variant="secondary">Default</Badge>
-                  </div>
+                  ))}
                 </div>
-
-                <div className="text-center py-4 text-sm text-muted-foreground">
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
                   Add a payment method to enable automatic billing
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
@@ -266,6 +308,17 @@ const Payments = () => {
           </Card>
         </div>
       </main>
+
+      {/* Dialogs */}
+      <AddPaymentMethodDialog
+        open={isAddPaymentDialogOpen}
+        onOpenChange={setIsAddPaymentDialogOpen}
+      />
+      <ChangePlanDialog
+        open={isChangePlanDialogOpen}
+        onOpenChange={setIsChangePlanDialogOpen}
+        currentPlanId={subscription?.plan_id || undefined}
+      />
     </div>
   );
 };
