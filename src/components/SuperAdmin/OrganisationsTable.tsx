@@ -44,10 +44,18 @@ export const OrganisationsTable = () => {
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showEditPlanDialog, setShowEditPlanDialog] = useState(false);
   const [showUsersDialog, setShowUsersDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
   const [orgUsers, setOrgUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [newOrgData, setNewOrgData] = useState({
+    name: "",
+    domain: "",
+    billing_email: "",
+    plan_id: "",
+    account_type: "organization"
+  });
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -294,6 +302,69 @@ export const OrganisationsTable = () => {
     }
   };
 
+  const handleCreateOrganisation = async () => {
+    try {
+      if (!newOrgData.name.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Organisation name is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create the organisation
+      const { data: orgData, error: orgError } = await supabase
+        .from("organisations")
+        .insert({
+          name: newOrgData.name,
+          domain: newOrgData.domain || null,
+          billing_email: newOrgData.billing_email || null,
+          plan_id: newOrgData.plan_id || null,
+          account_type: "organization",
+          plan: subscriptionPlans.find(p => p.id === newOrgData.plan_id)?.plan_name || "free"
+        })
+        .select()
+        .single();
+
+      if (orgError) throw orgError;
+
+      // Create subscription if plan is selected
+      if (newOrgData.plan_id && orgData) {
+        const selectedPlanData = subscriptionPlans.find(p => p.id === newOrgData.plan_id);
+        await supabase
+          .from("subscriptions")
+          .insert({
+            organisation_id: orgData.id,
+            plan_id: newOrgData.plan_id,
+            plan_name: selectedPlanData?.plan_name || "free",
+            status: "active",
+          });
+      }
+
+      toast({
+        title: "Success",
+        description: `Organisation "${newOrgData.name}" has been created`,
+      });
+
+      setShowCreateDialog(false);
+      setNewOrgData({
+        name: "",
+        domain: "",
+        billing_email: "",
+        plan_id: "",
+        account_type: "organization"
+      });
+      fetchOrganisations();
+    } catch (error: any) {
+      toast({
+        title: "Error creating organisation",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
@@ -311,10 +382,7 @@ export const OrganisationsTable = () => {
             Refresh
           </Button>
           <Button 
-            onClick={() => toast({
-              title: "Create Organisation",
-              description: "Organisation creation feature coming soon",
-            })} 
+            onClick={() => setShowCreateDialog(true)} 
             size="sm"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -618,6 +686,86 @@ export const OrganisationsTable = () => {
                 </Table>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Organisation Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New Organisation</DialogTitle>
+            <DialogDescription>
+              Add a new organisation to the system
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="org-name">Organisation Name *</Label>
+              <Input
+                id="org-name"
+                placeholder="Enter organisation name"
+                value={newOrgData.name}
+                onChange={(e) => setNewOrgData({ ...newOrgData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-domain">Domain</Label>
+              <Input
+                id="org-domain"
+                placeholder="example.com"
+                value={newOrgData.domain}
+                onChange={(e) => setNewOrgData({ ...newOrgData, domain: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-billing-email">Billing Email</Label>
+              <Input
+                id="org-billing-email"
+                type="email"
+                placeholder="billing@example.com"
+                value={newOrgData.billing_email}
+                onChange={(e) => setNewOrgData({ ...newOrgData, billing_email: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-plan">Subscription Plan</Label>
+              <Select
+                value={newOrgData.plan_id}
+                onValueChange={(value) => setNewOrgData({ ...newOrgData, plan_id: value })}
+              >
+                <SelectTrigger id="org-plan">
+                  <SelectValue placeholder="Select a plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subscriptionPlans.map((plan) => (
+                    <SelectItem key={plan.id} value={plan.id}>
+                      {plan.display_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateDialog(false);
+                setNewOrgData({
+                  name: "",
+                  domain: "",
+                  billing_email: "",
+                  plan_id: "",
+                  account_type: "organization"
+                });
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreateOrganisation}>
+              Create Organisation
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
