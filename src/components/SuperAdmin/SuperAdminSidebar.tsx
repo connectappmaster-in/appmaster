@@ -96,7 +96,7 @@ export function SuperAdminSidebar() {
     maxWidth: collapsed ? "56px" : "200px"
   }}>
       {/* Header - matches navbar height */}
-      <div className="flex items-center border-b border-border px-2" style={{
+      <div className="flex items-center border-b border-border pl-12 pr-2" style={{
       height: "52px"
     }}>
         
