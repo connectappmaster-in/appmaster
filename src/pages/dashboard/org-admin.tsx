@@ -1,42 +1,60 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useOrganisation } from "@/contexts/OrganisationContext";
-import { Navigate, Link } from "react-router-dom";
-import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
-import { StatsCard } from "@/components/Dashboard/StatsCard";
-import { ToolCard } from "@/components/Dashboard/ToolCard";
-import { 
-  Users, Ticket, Package, TrendingUp, 
-  Calendar, FileText, ShoppingBag, Mail,
-  DollarSign, BarChart3, Clock, Briefcase, Settings, CreditCard
-} from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Navigate, Routes, Route } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { OrgAdminSidebar } from "@/components/OrgAdmin/OrgAdminSidebar";
+import { OrgSettings } from "@/components/OrgAdmin/OrgSettings";
+import { UserManagement } from "@/components/OrgAdmin/UserManagement";
+import { ToolsManagement } from "@/components/OrgAdmin/ToolsManagement";
+import { BillingSettings } from "@/components/OrgAdmin/BillingSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Shield, Settings } from "lucide-react";
+
+const SecuritySettings = () => (
+  <div className="space-y-6">
+    <div>
+      <h1 className="text-3xl font-bold">Security Settings</h1>
+      <p className="text-muted-foreground">
+        Manage security and authentication settings
+      </p>
+    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          Security Options
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Security settings coming soon...</p>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const GeneralSettings = () => (
+  <div className="space-y-6">
+    <div>
+      <h1 className="text-3xl font-bold">General Settings</h1>
+      <p className="text-muted-foreground">
+        Additional organization settings and preferences
+      </p>
+    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5" />
+          General Options
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">Additional settings coming soon...</p>
+      </CardContent>
+    </Card>
+  </div>
+);
 
 const OrgAdminDashboard = () => {
-  const { user, accountType, userRole, loading } = useAuth();
-  const { organisation } = useOrganisation();
-
-  const { data: stats } = useQuery({
-    queryKey: ["org-admin-stats"],
-    queryFn: async () => {
-      const [leadsCount, ticketsCount, inventoryCount, usersCount] = await Promise.all([
-        supabase.from("crm_leads").select("*", { count: "exact", head: true }),
-        supabase.from("crm_contacts").select("*", { count: "exact", head: true }),
-        supabase.from("inventory_items").select("*", { count: "exact", head: true }),
-        supabase.from("users").select("*", { count: "exact", head: true }).eq("status", "active"),
-      ]);
-
-      return {
-        leads: leadsCount.count || 0,
-        tickets: ticketsCount.count || 0,
-        inventory: inventoryCount.count || 0,
-        users: usersCount.count || 0,
-      };
-    },
-    enabled: !!user,
-  });
+  const { accountType, userRole, loading } = useAuth();
 
   if (loading) {
     return (
@@ -51,116 +69,32 @@ const OrgAdminDashboard = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const activeTools = organisation?.active_tools || [];
-  
-  const allTools = [
-    { key: "crm", name: "CRM", icon: Users, path: "/crm", color: "text-blue-500" },
-    { key: "tickets", name: "Tickets", icon: Ticket, path: "/tickets", color: "text-orange-500" },
-    { key: "inventory", name: "Inventory", icon: Package, path: "/inventory", color: "text-green-500" },
-    { key: "attendance", name: "Attendance", icon: Calendar, path: "/attendance", color: "text-purple-500" },
-    { key: "invoicing", name: "Invoicing", icon: FileText, path: "/invoicing", color: "text-yellow-500" },
-    { key: "subscriptions", name: "Subscriptions", icon: TrendingUp, path: "/subscriptions", color: "text-pink-500" },
-    { key: "assets", name: "Assets", icon: Briefcase, path: "/assets", color: "text-indigo-500" },
-    { key: "depreciation", name: "Depreciation", icon: BarChart3, path: "/depreciation", color: "text-red-500" },
-    { key: "shop", name: "Shop Income/Expense", icon: ShoppingBag, path: "/shop-income-expense", color: "text-teal-500" },
-    { key: "marketing", name: "Marketing", icon: Mail, path: "/marketing", color: "text-cyan-500" },
-    { key: "recruitment", name: "Recruitment", icon: Clock, path: "/recruitment", color: "text-violet-500" },
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
-      
-      <div className="container mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">{organisation?.name}</h1>
-            <p className="text-muted-foreground">Organization Admin Dashboard</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link to="/admin">
-                <Settings className="h-4 w-4 mr-2" />
-                Manage Users
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/profile">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Billing
-              </Link>
-            </Button>
-          </div>
-        </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <OrgAdminSidebar />
+        
+        <div className="flex-1">
+          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-6">
+            <SidebarTrigger />
+            <div className="flex-1" />
+          </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatsCard
-            title="Active Users"
-            value={stats?.users || 0}
-            icon={Users}
-            color="from-blue-500 to-blue-600"
-          />
-          <StatsCard
-            title="Total Leads"
-            value={stats?.leads || 0}
-            icon={TrendingUp}
-            color="from-green-500 to-green-600"
-          />
-          <StatsCard
-            title="Total Contacts"
-            value={stats?.tickets || 0}
-            icon={Ticket}
-            color="from-orange-500 to-orange-600"
-          />
-          <StatsCard
-            title="Inventory Items"
-            value={stats?.inventory || 0}
-            icon={Package}
-            color="from-purple-500 to-purple-600"
-          />
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Subscription Plan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold capitalize">{organisation?.plan || "Free"}</p>
-                <p className="text-sm text-muted-foreground">
-                  {activeTools.length} active tools
-                </p>
-              </div>
-              <Button asChild>
-                <Link to="/profile">Upgrade Plan</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Active Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {allTools.map((tool) => {
-              const isActive = activeTools.includes(tool.key);
-              return (
-                <ToolCard
-                  key={tool.key}
-                  name={tool.name}
-                  icon={tool.icon}
-                  path={tool.path}
-                  color={tool.color}
-                  isActive={isActive}
-                  isLocked={!isActive}
-                />
-              );
-            })}
-          </div>
+          <main className="p-6">
+            <Routes>
+              <Route index element={<OrgSettings />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="tools" element={<ToolsManagement />} />
+              <Route path="billing" element={<BillingSettings />} />
+              <Route path="security" element={<SecuritySettings />} />
+              <Route path="settings" element={<GeneralSettings />} />
+            </Routes>
+          </main>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
 export default OrgAdminDashboard;
+
