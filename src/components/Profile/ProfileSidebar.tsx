@@ -11,7 +11,7 @@ const navigationItems = [
 
 export const ProfileSidebar = () => {
   return (
-    <aside className="w-56 bg-background border-r min-h-screen pt-4">
+    <aside className="w-56 bg-background border-r min-h-screen pt-16">
       <nav className="space-y-1 px-2">
         {navigationItems.map((item) => (
           <NavLink
