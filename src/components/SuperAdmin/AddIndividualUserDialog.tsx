@@ -10,6 +10,11 @@ import { z } from "zod";
 const userSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(72, "Password must be less than 72 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 interface AddIndividualUserDialogProps {
@@ -23,8 +28,10 @@ export const AddIndividualUserDialog = ({ open, onOpenChange, onUserAdded }: Add
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +42,7 @@ export const AddIndividualUserDialog = ({ open, onOpenChange, onUserAdded }: Add
       userSchema.parse(formData);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldErrors: { name?: string; email?: string } = {};
+        const fieldErrors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
         error.errors.forEach((err) => {
           if (err.path[0]) {
             fieldErrors[err.path[0] as keyof typeof fieldErrors] = err.message;
@@ -77,7 +84,7 @@ export const AddIndividualUserDialog = ({ open, onOpenChange, onUserAdded }: Add
       if (userError) throw userError;
 
       toast.success("Individual user created successfully");
-      setFormData({ name: "", email: "" });
+      setFormData({ name: "", email: "", password: "", confirmPassword: "" });
       onOpenChange(false);
       onUserAdded();
     } catch (error: any) {
@@ -121,6 +128,30 @@ export const AddIndividualUserDialog = ({ open, onOpenChange, onUserAdded }: Add
                 maxLength={255}
               />
               {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Enter password (min. 8 characters)"
+                maxLength={72}
+              />
+              {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                placeholder="Re-enter password"
+                maxLength={72}
+              />
+              {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
             </div>
           </div>
           <DialogFooter>
