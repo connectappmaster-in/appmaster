@@ -71,14 +71,40 @@ export const RecoveryOptionsDialog = ({
         .single();
 
       if (error) throw error;
-      return data;
+
+      // Send verification email
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
+        "send-recovery-verification",
+        {
+          body: {
+            userId: user.id,
+            type: "email",
+            value: email,
+          },
+        }
+      );
+
+      if (verifyError) {
+        console.error("Verification email error:", verifyError);
+      }
+
+      return { data, verifyData };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["recovery-options"] });
-      toast({
-        title: "Recovery email updated",
-        description: "Check your new email for a confirmation link.",
-      });
+      
+      if (result.verifyData?.code) {
+        // In development, show the code in the toast
+        toast({
+          title: "Recovery email added",
+          description: `Verification system not fully configured. Dev code: ${result.verifyData.code}`,
+        });
+      } else {
+        toast({
+          title: "Recovery email added",
+          description: "Please check your email for verification instructions.",
+        });
+      }
       setRecoveryEmail("");
     },
     onError: (error: any) => {
@@ -114,14 +140,40 @@ export const RecoveryOptionsDialog = ({
         .single();
 
       if (error) throw error;
-      return data;
+
+      // Send verification SMS
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
+        "send-recovery-verification",
+        {
+          body: {
+            userId: user.id,
+            type: "phone",
+            value: cleanPhone,
+          },
+        }
+      );
+
+      if (verifyError) {
+        console.error("Verification SMS error:", verifyError);
+      }
+
+      return { data, verifyData };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["recovery-options"] });
-      toast({
-        title: "Recovery phone updated",
-        description: "A verification code will be sent to your phone.",
-      });
+      
+      if (result.verifyData?.code) {
+        // In development, show the code in the toast
+        toast({
+          title: "Recovery phone added",
+          description: `SMS system not fully configured. Dev code: ${result.verifyData.code}`,
+        });
+      } else {
+        toast({
+          title: "Recovery phone added",
+          description: "A verification code has been sent to your phone.",
+        });
+      }
       setRecoveryPhone("");
     },
     onError: (error: any) => {
