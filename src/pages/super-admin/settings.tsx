@@ -124,6 +124,8 @@ const SuperAdminSettings = () => {
                     <SelectItem value="America/Chicago">Central Time</SelectItem>
                     <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
                     <SelectItem value="Europe/London">London</SelectItem>
+                    <SelectItem value="Europe/Athens">EU +2:00</SelectItem>
+                    <SelectItem value="Asia/Kolkata">IST (Indian Standard Time)</SelectItem>
                     <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
                   </SelectContent>
                 </Select>
