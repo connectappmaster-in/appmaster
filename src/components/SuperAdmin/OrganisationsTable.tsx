@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
+import { AddOrgUserDialog } from "./AddOrgUserDialog";
 
 export const OrganisationsTable = () => {
   const [organisations, setOrganisations] = useState<any[]>([]);
@@ -49,6 +50,7 @@ export const OrganisationsTable = () => {
   const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
   const [orgUsers, setOrgUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [showAddUserDialog, setShowAddUserDialog] = useState(false);
   const [newOrgData, setNewOrgData] = useState({
     name: "",
     domain: "",
@@ -625,10 +627,18 @@ export const OrganisationsTable = () => {
       <Dialog open={showUsersDialog} onOpenChange={setShowUsersDialog}>
         <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Manage Users - {selectedOrg?.name}</DialogTitle>
-            <DialogDescription>
-              View and manage all users in this organisation
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle>Manage Users - {selectedOrg?.name}</DialogTitle>
+                <DialogDescription>
+                  View and manage all users in this organisation
+                </DialogDescription>
+              </div>
+              <Button onClick={() => setShowAddUserDialog(true)} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </div>
           </DialogHeader>
           <div className="py-4">
             {loadingUsers ? (
@@ -769,6 +779,35 @@ export const OrganisationsTable = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Add User to Organization Dialog */}
+      {selectedOrg && (
+        <AddOrgUserDialog
+          open={showAddUserDialog}
+          onOpenChange={setShowAddUserDialog}
+          organisationId={selectedOrg.id}
+          organisationName={selectedOrg.name}
+          onUserAdded={async () => {
+            // Reload org users
+            setLoadingUsers(true);
+            try {
+              const { data, error } = await supabase
+                .from("users")
+                .select("*")
+                .eq("organisation_id", selectedOrg.id)
+                .neq("user_type", "appmaster_admin")
+                .order("created_at", { ascending: false });
+              
+              if (error) throw error;
+              setOrgUsers(data || []);
+            } catch (error) {
+              console.error("Error fetching users:", error);
+            } finally {
+              setLoadingUsers(false);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
