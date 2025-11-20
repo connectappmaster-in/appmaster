@@ -54,34 +54,41 @@ export const TwoFactorDialog = ({
     enabled: !!user?.id && open,
   });
 
+  // Show loading if user is not available yet
+  const showLoading = isLoading || !user;
+
   // Enroll MFA
   const enrollMfaMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error("User not authenticated");
+
       // First, clean up any existing factors and database settings
       const { data: factors } = await supabase.auth.mfa.listFactors();
       
       if (factors?.totp && factors.totp.length > 0) {
-        for (const factor of factors.totp) {
-          try {
-            await supabase.auth.mfa.unenroll({ factorId: factor.id });
-          } catch (err) {
-            console.error("Error unenrolling factor:", err);
-          }
-        }
+        // Wait for all factors to be unenrolled
+        await Promise.all(
+          factors.totp.map(factor =>
+            supabase.auth.mfa.unenroll({ factorId: factor.id })
+              .catch(err => console.error("Error unenrolling factor:", err))
+          )
+        );
       }
 
       // Clean up database settings
-      if (user?.id) {
-        await supabase
-          .from("user_mfa_settings")
-          .delete()
-          .eq("user_id", user.id);
-      }
+      await supabase
+        .from("user_mfa_settings")
+        .delete()
+        .eq("user_id", user.id);
 
-      // Now enroll a new factor with a friendly name
+      // Wait a bit to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Now enroll a new factor with a unique friendly name
+      const timestamp = Date.now();
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: "totp",
-        friendlyName: "Authenticator App",
+        friendlyName: `Authenticator-${timestamp}`,
       });
 
       if (error) throw error;
@@ -217,7 +224,7 @@ export const TwoFactorDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {isLoading ? (
+        {showLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
