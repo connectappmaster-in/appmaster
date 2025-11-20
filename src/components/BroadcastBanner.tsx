@@ -15,6 +15,7 @@ export function BroadcastBanner() {
   const { user, accountType, userRole } = useAuth();
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [bannerHeight, setBannerHeight] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -109,34 +110,40 @@ export function BroadcastBanner() {
 
   const visibleBroadcasts = broadcasts.filter(b => !dismissedIds.has(b.id));
 
-  if (visibleBroadcasts.length === 0) return null;
+  if (!user || visibleBroadcasts.length === 0) return null;
 
   return (
-    <div className="space-y-2">
-      {visibleBroadcasts.map((broadcast) => (
-        <div
-          key={broadcast.id}
-          className="bg-primary/10 border-l-4 border-primary px-4 py-3 flex items-start gap-3 animate-in slide-in-from-top duration-300"
-        >
-          <Megaphone className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-          <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-foreground mb-1">
-              {broadcast.title}
-            </h4>
-            <p className="text-sm text-muted-foreground">
-              {broadcast.description}
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 flex-shrink-0 hover:bg-primary/20"
-            onClick={() => dismissBroadcast(broadcast.id)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+    <>
+      <div className="fixed top-[52px] left-0 right-0 z-40 bg-background">
+        <div className="container mx-auto px-4 space-y-2 py-2">
+          {visibleBroadcasts.map((broadcast) => (
+            <div
+              key={broadcast.id}
+              className="bg-primary/10 border-l-4 border-primary px-4 py-3 flex items-start gap-3 rounded-md animate-in slide-in-from-top duration-300"
+            >
+              <Megaphone className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-semibold text-foreground mb-1">
+                  {broadcast.title}
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  {broadcast.description}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 flex-shrink-0 hover:bg-primary/20"
+                onClick={() => dismissBroadcast(broadcast.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+      {/* Spacer to prevent content from being hidden behind fixed banner */}
+      <div style={{ height: `${(visibleBroadcasts.length * 80) + 16}px` }} />
+    </>
   );
 }

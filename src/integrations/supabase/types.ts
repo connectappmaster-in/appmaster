@@ -2540,6 +2540,17 @@ export type Database = {
         Args: { limit_type: string; org_id: string }
         Returns: boolean
       }
+      create_notification: {
+        Args: {
+          p_message: string
+          p_organisation_id?: string
+          p_tenant_id?: number
+          p_title: string
+          p_type: Database["public"]["Enums"]["notification_type"]
+          p_user_id: string
+        }
+        Returns: string
+      }
       generate_invitation_token: { Args: never; Returns: string }
       get_appmaster_admin_details: {
         Args: never
