@@ -9,22 +9,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { ProfileSidebar } from "@/components/Profile/ProfileSidebar";
+import { ProfileCard } from "@/components/Profile/ProfileCard";
 import {
-  ArrowLeft,
-  Calendar,
   Loader2,
   Mail,
-  Phone,
   Shield,
-  User,
-  Save,
-  LockKeyhole,
-  Building2,
-  Edit,
-  CheckCircle2,
   Lock,
+  Search,
+  Key,
+  Smartphone,
+  Activity,
+  Eye,
+  Settings,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 
 const Profile = () => {
@@ -279,275 +279,146 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Header */}
-      <div className="border-b bg-card/60 backdrop-blur-xl">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-7xl">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 hover:bg-primary/10"
-              onClick={() => {
-                if (window.history.length > 1) {
-                  navigate(-1);
-                } else {
-                  // Default fallback navigation
-                  navigate('/');
-                }
-              }}
-              aria-label="Go back"
-              type="button"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                Profile Settings
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <ProfileSidebar />
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+          {/* Header Section */}
+          <div className="text-center space-y-4">
+            <Avatar className="h-24 w-24 mx-auto border-4 border-primary/20">
+              <AvatarImage src={profile?.avatar_url || ""} />
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground text-3xl font-bold">
+                {getInitials(userData?.name)}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div>
+              <h1 className="text-3xl font-normal text-foreground">
+                Welcome, {formData.name || "User"}
               </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Manage your account information and security
+              <p className="text-sm text-muted-foreground mt-2">
+                Manage your info, privacy, and security to make our app work better for you.
               </p>
             </div>
-            {(isFetching || updateProfileMutation.isPending) && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="hidden sm:inline">Saving...</span>
-              </div>
-            )}
           </div>
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar - Profile Card */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-card border border-border rounded-xl shadow-lg p-6">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="relative">
-                  <Avatar className="h-28 w-28 border-4 border-primary/20 shadow-xl">
-                    <AvatarImage src={profile?.avatar_url || ""} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground text-3xl font-bold">
-                      {getInitials(userData?.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-green-500 border-4 border-card rounded-full" />
-                </div>
-                
-                <div className="w-full">
-                  <h3 className="font-bold text-xl truncate">{formData.name || "User"}</h3>
-                  <p className="text-sm text-muted-foreground flex items-center justify-center mt-1 gap-1">
-                    <Mail className="h-3 w-3" />
-                    <span className="truncate">{formData.email || user?.email}</span>
-                  </p>
-                </div>
-
-                <div className="w-full pt-4 border-t space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
-                    <span className="text-sm text-muted-foreground">Role</span>
-                    <span className="font-semibold capitalize text-primary text-sm">
-                      {userData?.role || "Member"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-500/5 rounded-lg">
-                    <span className="text-sm text-muted-foreground">Status</span>
-                    <span className="font-semibold flex items-center text-green-600 text-sm gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      {userData?.status || "Active"}
-                    </span>
-                  </div>
-                </div>
-              </div>
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search account settings"
+                className="pl-10 h-12 bg-muted/50"
+              />
             </div>
+          </div>
 
-            {/* Account Info Card */}
-            <div className="bg-card border border-border rounded-xl shadow-lg p-6">
-              <h3 className="font-semibold text-sm flex items-center gap-2 mb-4">
-                <Calendar className="h-4 w-4 text-primary" />
-                Account Information
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2.5 border-b border-border/50">
-                  <span className="text-sm text-muted-foreground">Member Since</span>
-                  <span className="text-sm font-medium">
+          {/* Quick Actions */}
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Button variant="outline" className="gap-2">
+              <Key className="h-4 w-4" />
+              My password
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Smartphone className="h-4 w-4" />
+              Devices
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Lock className="h-4 w-4" />
+              Password Manager
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Activity className="h-4 w-4" />
+              My Activity
+            </Button>
+            <Button variant="outline" className="gap-2">
+              <Mail className="h-4 w-4" />
+              Email
+            </Button>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Profile & Personalization Card */}
+            <ProfileCard
+              title="Profile & personalization"
+              description="See your profile data and manage your account information"
+              icon={
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                  <Settings className="h-8 w-8 text-white" />
+                </div>
+              }
+              actionLabel="Manage your profile info"
+              onAction={() => navigate("/profile/personal-info")}
+            />
+
+            {/* Security Tips Card */}
+            <ProfileCard
+              title="You have security recommendations"
+              description="Security issues found in your Security Checkup"
+              icon={
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                  <CheckCircle2 className="h-8 w-8 text-white" />
+                </div>
+              }
+              actionLabel="Review security tips"
+              onAction={() => navigate("/profile/security")}
+            />
+
+            {/* Privacy Settings Card */}
+            <ProfileCard
+              title="Privacy settings available"
+              description="Take the Privacy Checkup and choose the settings that are right for you"
+              icon={
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                  <Eye className="h-8 w-8 text-white" />
+                </div>
+              }
+              actionLabel="Review privacy settings"
+              onAction={() => navigate("/profile/privacy")}
+            />
+
+            {/* Account Information Card */}
+            <ProfileCard
+              title="Account information"
+              description="View and manage your account details and preferences"
+              icon={
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                  <AlertCircle className="h-8 w-8 text-white" />
+                </div>
+              }
+            >
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-muted-foreground">Email</span>
+                  <span className="font-medium">{formData.email || user?.email}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-muted-foreground">Role</span>
+                  <span className="font-medium capitalize">{userData?.role || "Member"}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className="font-medium text-green-600">
+                    {userData?.status || "Active"}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-muted-foreground">Member Since</span>
+                  <span className="font-medium">
                     {userData?.created_at
                       ? format(new Date(userData.created_at), "MMM dd, yyyy")
                       : "-"}
                   </span>
                 </div>
-                {!isAppmasterAdmin && (
-                  <div className="flex items-center justify-between py-2.5">
-                    <span className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Building2 className="h-3 w-3" />
-                      Organization
-                    </span>
-                    <span className="text-sm font-medium truncate ml-2">
-                      {organisation?.name || "-"}
-                    </span>
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
-
-          {/* Right Content - Details */}
-          <div className="lg:col-span-8 space-y-6">
-            {/* Profile Info Section */}
-            <div className="bg-card border border-border rounded-xl shadow-lg">
-              <div className="p-6 flex items-center justify-between border-b">
-                <div>
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <User className="h-5 w-5 text-primary" />
-                    Profile Information
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Update your personal details
-                  </p>
-                </div>
-                {!isEditing && (
-                  <Button onClick={handleEdit} variant="outline" size="sm" className="gap-2">
-                    <Edit className="h-4 w-4" />
-                    Edit
-                  </Button>
-                )}
-              </div>
-              
-              <div className="p-6 space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium flex items-center gap-1.5">
-                      <User className="h-3.5 w-3.5 text-primary" />
-                      Full Name
-                    </Label>
-                    {isEditing ? (
-                      <Input
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Enter your full name"
-                        className="h-11 bg-background"
-                      />
-                    ) : (
-                      <div className="h-11 px-4 py-2 bg-muted/50 rounded-lg flex items-center border border-border/50">
-                        <p className="text-sm">{formData.name || "-"}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5 text-primary" />
-                      Phone Number
-                    </Label>
-                    {isEditing ? (
-                      <Input
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="Enter phone number"
-                        className="h-11 bg-background"
-                      />
-                    ) : (
-                      <div className="h-11 px-4 py-2 bg-muted/50 rounded-lg flex items-center border border-border/50">
-                        <p className="text-sm">{formData.phone || "-"}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium flex items-center gap-1.5">
-                    <Mail className="h-3.5 w-3.5 text-primary" />
-                    Email Address
-                  </Label>
-                  <div className="h-11 px-4 py-2 bg-muted/30 rounded-lg flex items-center justify-between border border-dashed">
-                    <p className="text-sm">{formData.email || user?.email}</p>
-                    <span className="text-xs text-muted-foreground hidden sm:inline">Cannot be changed</span>
-                  </div>
-                </div>
-
-                {isEditing && (
-                  <div className="flex justify-end gap-3 pt-4 border-t">
-                    <Button 
-                      variant="outline" 
-                      onClick={handleCancel}
-                      disabled={updateProfileMutation.isPending}
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      onClick={handleSave}
-                      disabled={updateProfileMutation.isPending}
-                      className="gap-2"
-                    >
-                      {updateProfileMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Security Section */}
-            <div className="bg-card border border-border rounded-xl shadow-lg">
-              <div className="p-6 border-b">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-primary" />
-                  Security Settings
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Manage your account security
-                </p>
-              </div>
-              
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-3 p-5 bg-muted/30 rounded-xl border border-border/50">
-                    <div className="flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-primary" />
-                      <Label className="text-sm font-medium">Password</Label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">••••••••</span>
-                      <Button variant="ghost" size="sm" className="h-8 hover:text-primary">
-                        Change
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Managed by authentication system
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 p-5 bg-muted/30 rounded-xl border border-border/50">
-                    <Label className="text-sm font-medium flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-primary" />
-                      Multi-factor Authentication
-                    </Label>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Coming soon</span>
-                      <Button variant="ghost" size="sm" className="h-8" disabled>
-                        Enable
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Not configurable at this time
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </ProfileCard>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
