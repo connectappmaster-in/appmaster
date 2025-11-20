@@ -173,7 +173,7 @@ export function SuperAdminSidebar() {
         {/* User Profile */}
         <div>
           {(() => {
-            const displayName = user?.email || "Admin";
+            const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || "Admin";
             const profileButton = (
               <button
                 onClick={() => navigate("/profile")}
