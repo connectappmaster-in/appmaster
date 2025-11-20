@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, MessageSquare, Eye, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-
 interface ContactSubmission {
   id: string;
   name: string;
@@ -16,19 +15,20 @@ interface ContactSubmission {
   status: 'new' | 'read' | 'responded';
   created_at: string;
 }
-
 const ContactSubmissions = () => {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const fetchSubmissions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('contact_submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('contact_submissions').select('*').order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
       setSubmissions((data || []) as ContactSubmission[]);
     } catch (error) {
@@ -36,29 +36,26 @@ const ContactSubmissions = () => {
       toast({
         title: "Error",
         description: "Failed to load contact submissions.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSubmissions();
   }, []);
-
   const updateStatus = async (id: string, status: 'read' | 'responded') => {
     try {
-      const { error } = await supabase
-        .from('contact_submissions')
-        .update({ status })
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('contact_submissions').update({
+        status
+      }).eq('id', id);
       if (error) throw error;
-
       toast({
         title: "Status updated",
-        description: `Submission marked as ${status}.`,
+        description: `Submission marked as ${status}.`
       });
       fetchSubmissions();
     } catch (error) {
@@ -66,49 +63,37 @@ const ContactSubmissions = () => {
       toast({
         title: "Error",
         description: "Failed to update status.",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "outline"> = {
       new: "default",
       read: "secondary",
-      responded: "outline",
+      responded: "outline"
     };
-    return (
-      <Badge variant={variants[status] || "default"}>
+    return <Badge variant={variants[status] || "default"}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
+      </Badge>;
   };
-
   if (loading) {
     return <div className="p-4">Loading...</div>;
   }
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-bold">Contact Submissions</h2>
-        <p className="text-sm text-muted-foreground">
-          View and manage custom tool requests from users
-        </p>
+        
+        
       </div>
 
-      {submissions.length === 0 ? (
-        <Card>
+      {submissions.length === 0 ? <Card>
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">
               No contact submissions yet.
             </p>
           </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {submissions.map((submission) => (
-            <Card key={submission.id}>
+        </Card> : <div className="grid gap-4">
+          {submissions.map(submission => <Card key={submission.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -122,25 +107,14 @@ const ContactSubmissions = () => {
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    {submission.status === 'new' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateStatus(submission.id, 'read')}
-                      >
+                    {submission.status === 'new' && <Button size="sm" variant="outline" onClick={() => updateStatus(submission.id, 'read')}>
                         <Eye className="w-4 h-4 mr-2" />
                         Mark Read
-                      </Button>
-                    )}
-                    {submission.status !== 'responded' && (
-                      <Button
-                        size="sm"
-                        onClick={() => updateStatus(submission.id, 'responded')}
-                      >
+                      </Button>}
+                    {submission.status !== 'responded' && <Button size="sm" onClick={() => updateStatus(submission.id, 'responded')}>
                         <Check className="w-4 h-4 mr-2" />
                         Mark Responded
-                      </Button>
-                    )}
+                      </Button>}
                   </div>
                 </div>
               </CardHeader>
@@ -148,24 +122,16 @@ const ContactSubmissions = () => {
                 <div className="grid gap-2">
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <a
-                      href={`mailto:${submission.email}`}
-                      className="text-primary hover:underline"
-                    >
+                    <a href={`mailto:${submission.email}`} className="text-primary hover:underline">
                       {submission.email}
                     </a>
                   </div>
-                  {submission.phone && (
-                    <div className="flex items-center gap-2 text-sm">
+                  {submission.phone && <div className="flex items-center gap-2 text-sm">
                       <Phone className="w-4 h-4 text-muted-foreground" />
-                      <a
-                        href={`tel:${submission.phone}`}
-                        className="text-primary hover:underline"
-                      >
+                      <a href={`tel:${submission.phone}`} className="text-primary hover:underline">
                         {submission.phone}
                       </a>
-                    </div>
-                  )}
+                    </div>}
                 </div>
                 <div className="border-t pt-4">
                   <p className="text-sm font-medium mb-2">Message:</p>
@@ -174,12 +140,8 @@ const ContactSubmissions = () => {
                   </p>
                 </div>
               </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+            </Card>)}
+        </div>}
+    </div>;
 };
-
 export default ContactSubmissions;
