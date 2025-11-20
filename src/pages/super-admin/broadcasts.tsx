@@ -75,13 +75,14 @@ export default function BroadcastsPage() {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase.from("broadcasts").insert({
+      const { error } = await supabase.from("broadcasts").insert([{
         title: data.title,
         description: data.description,
         target_audience: data.target_audience as "all_users" | "individual_users" | "organization_admins" | "organization_users",
         scheduled_for: data.scheduled_for || null,
         expires_at: data.expires_at || null,
-      });
+        created_by: user?.id || '',
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {
