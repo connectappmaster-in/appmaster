@@ -23,14 +23,21 @@ const IndividualDashboard = () => {
       
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("selected_tools")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching user tools:', error);
+        return [];
+      }
       
-      // Return empty array if selected_tools doesn't exist yet
+      // Return empty array if no data or selected_tools doesn't exist yet
       return (data as any)?.selected_tools || [];
     },
     enabled: !!user,
+    refetchOnMount: true,
+    staleTime: 0, // Always refetch when component mounts
   });
 
 

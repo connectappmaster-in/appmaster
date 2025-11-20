@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,6 +41,13 @@ export const AddToolsDialog = ({ open, onOpenChange, selectedTools, onToolsUpdat
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Sync tempSelectedTools with selectedTools prop when dialog opens
+  useEffect(() => {
+    if (open) {
+      setTempSelectedTools(selectedTools);
+    }
+  }, [open, selectedTools]);
 
   const handleToggleTool = (toolKey: string) => {
     setTempSelectedTools(prev => 
