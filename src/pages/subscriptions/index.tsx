@@ -8,7 +8,7 @@ const Subscriptions = () => {
       <BackButton />
       <SubscriptionsSidebar />
       
-      <main className="flex-1 min-h-screen flex flex-col bg-background">
+      <main className="flex-1 min-h-screen flex flex-col bg-background pt-16">
         <div className="border-b px-4 py-2">
           <h1 className="text-lg font-semibold">IT Tools & Subscriptions</h1>
         </div>

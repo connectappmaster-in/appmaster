@@ -118,7 +118,7 @@ export function SuperAdminSidebar() {
       });
     }
   };
-  return <div className="h-screen flex flex-col border-r border-border bg-background transition-all duration-300 ease-in-out" style={{
+  return <div className="h-screen flex flex-col border-r border-border bg-background transition-all duration-300 ease-in-out pt-16" style={{
     width: collapsed ? "56px" : "200px",
     minWidth: collapsed ? "56px" : "200px",
     maxWidth: collapsed ? "56px" : "200px"
