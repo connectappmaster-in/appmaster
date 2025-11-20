@@ -72,7 +72,7 @@ export function SuperAdminSidebar() {
       }}
     >
       {/* Header - matches navbar height */}
-      <div className="flex items-center border-b border-border px-2 py-2">
+      <div className="flex items-center border-b border-border px-2" style={{ height: "52px" }}>
         <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
           <LayoutDashboard className="h-5 w-5 text-primary" />
         </div>
