@@ -26,11 +26,11 @@ const OrgAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full pt-[52px]">
       <OrgAdminSidebar />
       
       <main className="flex-1 min-h-screen flex flex-col bg-background">
-        <div className="border-b px-4 flex items-center" style={{ height: "52px" }}>
+        <div className="border-b px-4 flex items-center h-[52px]">
           <h1 className="text-lg font-semibold">Organization Admin</h1>
         </div>
 

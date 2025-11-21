@@ -233,7 +233,8 @@ const Profile = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>;
   }
-  return <div className="flex min-h-screen bg-background">
+  return (
+    <div className="flex min-h-screen bg-background pt-[52px]">
       <BackButton />
       {/* Sidebar */}
       <ProfileSidebar />
@@ -318,6 +319,7 @@ const Profile = () => {
           </div>
         </div>
       </main>
-    </div>;
+    </div>
+  );
 };
 export default Profile;

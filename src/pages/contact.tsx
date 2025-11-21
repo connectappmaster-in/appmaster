@@ -63,7 +63,7 @@ const Contact = () => {
       [e.target.name]: e.target.value
     }));
   };
-  return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
+  return <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background pt-[52px]">
       <div className="container mx-auto px-4 py-8">
         <BackButton />
         
