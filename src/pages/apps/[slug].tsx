@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   BarChart3, Package, FileText, Users, Ticket, Briefcase, 
@@ -237,15 +235,13 @@ const AppDetailPage = () => {
 
   if (!app) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className="min-h-screen bg-background pt-[52px]">
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-4xl font-bold mb-4">App Not Found</h1>
           <Link to="/">
             <Button>Back to Home</Button>
           </Link>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -261,10 +257,8 @@ const AppDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="pt-20">
+    <div className="min-h-screen bg-background pt-[52px]">
+      <main className="pt-4">
         {/* Hero Section */}
         <section className="py-20 px-4 bg-gradient-to-br from-background via-accent/5 to-background relative overflow-hidden">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -370,8 +364,6 @@ const AppDetailPage = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 };
