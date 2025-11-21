@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Check, CheckCheck, X } from "lucide-react";
+import { Bell, Check, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface Notification {
   id: string;
@@ -24,45 +24,54 @@ interface Notification {
 }
 
 export function NotificationPanel() {
-  const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-
     fetchNotifications();
 
     // Set up real-time subscription
-    const channel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        },
-        () => {
-          fetchNotifications();
-        }
-      )
-      .subscribe();
+    const setupSubscription = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+
+      const channel = supabase
+        .channel('notifications-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${authUser.id}`
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+
+      return channel;
+    };
+
+    const channelPromise = setupSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      channelPromise.then(channel => {
+        if (channel) supabase.removeChannel(channel);
+      });
     };
-  }, [user]);
+  }, []);
 
   const fetchNotifications = async () => {
-    if (!user) return;
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) return;
 
     const { data, error } = await supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', authUser.id)
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -90,12 +99,13 @@ export function NotificationPanel() {
   };
 
   const markAllAsRead = async () => {
-    if (!user) return;
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) return;
 
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true, read_at: new Date().toISOString() })
-      .eq('user_id', user.id)
+      .eq('user_id', authUser.id)
       .eq('is_read', false);
 
     if (error) {
@@ -106,8 +116,6 @@ export function NotificationPanel() {
     toast.success('All notifications marked as read');
     fetchNotifications();
   };
-
-  if (!user) return null;
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -187,6 +195,13 @@ export function NotificationPanel() {
             </div>
           )}
         </ScrollArea>
+        <div className="p-2 border-t">
+          <Link to="/notifications" onClick={() => setOpen(false)}>
+            <Button variant="ghost" className="w-full text-sm">
+              View All Notifications
+            </Button>
+          </Link>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

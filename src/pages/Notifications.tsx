@@ -17,20 +17,35 @@ const Notifications = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, [user]);
+  }, []);
 
   const fetchNotifications = async () => {
-    if (!user) return;
-    
     setLoading(true);
     try {
+      // Get current auth user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      
+      if (!authUser) {
+        console.log("No authenticated user");
+        setNotifications([]);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Fetching notifications for user:", authUser.id);
+      
       const { data, error } = await supabase
         .from("notifications")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", authUser.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching notifications:", error);
+        throw error;
+      }
+      
+      console.log("Fetched notifications:", data);
       setNotifications(data || []);
     } catch (error: any) {
       console.error("Error fetching notifications:", error);
@@ -42,10 +57,14 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+
       const { error } = await supabase
         .from("notifications")
         .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq("id", notificationId);
+        .eq("id", notificationId)
+        .eq("user_id", authUser.id);
 
       if (error) throw error;
       
@@ -60,12 +79,18 @@ const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+
       const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+      
+      if (unreadIds.length === 0) return;
       
       const { error } = await supabase
         .from("notifications")
         .update({ is_read: true, read_at: new Date().toISOString() })
-        .in("id", unreadIds);
+        .in("id", unreadIds)
+        .eq("user_id", authUser.id);
 
       if (error) throw error;
       
@@ -78,10 +103,14 @@ const Notifications = () => {
 
   const deleteNotification = async (notificationId: string) => {
     try {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+
       const { error } = await supabase
         .from("notifications")
         .delete()
-        .eq("id", notificationId);
+        .eq("id", notificationId)
+        .eq("user_id", authUser.id);
 
       if (error) throw error;
       
