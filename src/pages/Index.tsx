@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useOrganisation } from "@/contexts/OrganisationContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { DashboardHeader } from "@/components/Dashboard/DashboardHeader";
 import { StatsCard } from "@/components/Dashboard/StatsCard";
 import { ToolCard } from "@/components/Dashboard/ToolCard";
 import { Users, Package, TrendingUp, CreditCard, BarChart3, Clock, Ticket, FileText, PackageSearch, ShoppingCart } from "lucide-react";
@@ -117,7 +118,8 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-[52px]">
+    <div className="min-h-screen bg-background">
+      <DashboardHeader />
       <main className="container mx-auto px-4 py-4">
         <div className="mb-4">
           <h1 className="text-2xl font-bold mb-1">Dashboard</h1>

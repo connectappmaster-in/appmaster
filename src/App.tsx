@@ -69,7 +69,6 @@ import SuperAdminBroadcasts from "./pages/super-admin/broadcasts";
 import { BroadcastBanner } from "./components/BroadcastBanner";
 import AppDetailPage from "./pages/apps/[slug]";
 import Notifications from "./pages/Notifications";
-import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,7 +88,6 @@ const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <OrganisationProvider>
-              <Navbar />
               <BroadcastBanner />
               <Routes>
                   <Route path="/" element={<Landing />} />

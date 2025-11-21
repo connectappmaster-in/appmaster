@@ -4,7 +4,7 @@ import { BackButton } from "@/components/BackButton";
 
 const Subscriptions = () => {
   return (
-    <div className="min-h-screen flex w-full pt-[52px]">
+    <div className="min-h-screen flex w-full">
       <BackButton />
       <SubscriptionsSidebar />
       

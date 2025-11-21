@@ -28,8 +28,12 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 h-[52px] flex items-center justify-between">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
+      isScrolled 
+        ? "bg-background/95 backdrop-blur-lg border-border" 
+        : "bg-transparent border-transparent"
+    }`}>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
           <img src={logo} alt="AppMaster" className="h-8 w-auto" />
         </Link>

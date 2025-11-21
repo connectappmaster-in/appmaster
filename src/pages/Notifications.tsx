@@ -128,7 +128,7 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-[52px]">
+    <div className="min-h-screen bg-background">
       <div className="container max-w-4xl mx-auto py-8 px-4">
         <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
